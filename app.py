@@ -10,9 +10,6 @@ from flask_migrate import Migrate
 from datetime import datetime
 from sqlalchemy import case  # Add this import for the case function
 from authlib.integrations.flask_client import OAuth
-from api_key import client_id, client_secret
-# --- Optional: Import ResourceForm if you create one ---
-# from forms import ResourceForm
 from itsdangerous import URLSafeTimedSerializer
 from flask_mail import Mail, Message
 import os
@@ -49,8 +46,8 @@ oauth = OAuth()
 oauth.init_app(app)
 google=oauth.register(
     name='google',
-    client_id=client_id,
-    client_secret=client_secret,
+    client_id=os.environ.get('GOOGLE_CLIENT_ID'),
+    client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={
         'scope': 'openid profile email',
