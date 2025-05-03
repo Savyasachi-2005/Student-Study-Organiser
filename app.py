@@ -39,12 +39,12 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
-app.config['MAIL_SERVER'] = os.environ.get('MAIL_SERVER', 'smtp.gmail.com')
-app.config['MAIL_PORT'] = int(os.environ.get('MAIL_PORT', 587))
-app.config['MAIL_USE_TLS'] = os.environ.get('MAIL_USE_TLS', 'True').lower() in ['true', '1', 't']
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'abhishekhiremath0424@gmail.com')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')  # This should be your App Password
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME', 'abhishekhiremath0424@gmail.com')
 
 # Initialize extensions
 bcrypt = Bcrypt()
@@ -563,32 +563,53 @@ def feedback():
     form = FeedbackForm()
     if form.validate_on_submit():
         try:
+            if not app.config['MAIL_PASSWORD']:
+                raise Exception("Email configuration is not properly set up. Please contact the administrator.")
+                
             # Create email message
             msg = Message(
-                'New Feedback from Study Organizer',
+                f'New Website Feedback: {form.feedback_type.data}',
                 sender=app.config['MAIL_USERNAME'],
                 recipients=['abhishekhiremath0424@gmail.com']
             )
             
             # Format email body
-            msg.body = f'''
-            New Feedback Received:
+            feedback_type_map = {
+                'bug': 'Bug Report',
+                'suggestion': 'Feature Suggestion',
+                'improvement': 'Improvement Idea',
+                'other': 'Other Feedback'
+            }
             
+            msg.body = f'''
+            New Website Feedback Received:
+            
+            Type: {feedback_type_map.get(form.feedback_type.data, 'Other')}
             Name: {form.name.data}
             Email: {form.email.data}
             Subject: {form.subject.data}
             Message: {form.message.data}
             
+            Contact Information:
+            - Email: abhishekhiremath0424@gmail.com
+            - WhatsApp: +91 8147893200
+            
+            Technical Details:
             Sent from: {request.remote_addr}
+            User Agent: {request.user_agent}
             '''
             
             # Send email
             mail.send(msg)
-            flash('Thank you for your feedback! We will get back to you soon.', 'success')
+            flash('Thank you for your feedback! We will review it and get back to you if needed.', 'success')
             return redirect(url_for('home'))
         except Exception as e:
             print(f"Error sending feedback email: {e}")
-            flash('There was an error sending your feedback. Please try again later.', 'danger')
+            error_message = str(e)
+            if "Authentication Required" in error_message:
+                flash('Email service is currently unavailable. Please try again later or contact us directly.', 'danger')
+            else:
+                flash('There was an error sending your feedback. Please try again later or contact us directly.', 'danger')
     
     return render_template('feedback.html', form=form)
 

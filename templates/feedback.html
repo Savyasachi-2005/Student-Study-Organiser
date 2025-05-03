@@ -34,6 +34,46 @@
     padding: 2rem;
 }
 
+.contact-info {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(74, 144, 226, 0.1);
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.contact-info a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.contact-info a:hover {
+    color: #2C5282;
+    text-decoration: underline;
+}
+
+.whatsapp-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #25D366;
+    color: white !important;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.whatsapp-link:hover {
+    background: #128C7E;
+    color: white !important;
+    text-decoration: none !important;
+}
+
+.whatsapp-link i {
+    font-size: 1.2rem;
+}
+
 .form-floating > .form-control:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label {
     color: var(--primary-color);
@@ -63,6 +103,20 @@ textarea.form-control {
     resize: vertical;
 }
 
+.form-select {
+    padding: 1rem 0.75rem;
+    height: auto;
+}
+
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+}
+
+.feedback-type-icon {
+    margin-right: 0.5rem;
+}
+
 @media (max-width: 768px) {
     .feedback-page {
         padding: 1rem 0;
@@ -83,11 +137,20 @@ textarea.form-control {
                 <div class="card shadow-lg border-0 feedback-card">
                     <div class="feedback-header">
                         <i class="fas fa-comment-alt fa-3x text-primary mb-3"></i>
-                        <h1 class="h3 mb-3 fw-bold">Send Us Feedback</h1>
-                        <p class="text-muted">We'd love to hear from you! Share your thoughts and suggestions.</p>
+                        <h1 class="h3 mb-3 fw-bold">Website Feedback</h1>
+                        <p class="text-muted">Help us improve your experience. Share your thoughts, report issues, or suggest new features.</p>
                     </div>
                     
                     <div class="feedback-form">
+                        <div class="contact-info">
+                            <p class="mb-2">Prefer to contact directly?</p>
+                            <p class="mb-2">Email: <a href="mailto:abhishekhiremath0424@gmail.com">abhishekhiremath0424@gmail.com</a></p>
+                            <a href="https://wa.me/918147893200" class="whatsapp-link" target="_blank">
+                                <i class="fab fa-whatsapp"></i>
+                                Chat on WhatsApp
+                            </a>
+                        </div>
+
                         <form method="post" class="needs-validation" novalidate>
                             {{ form.hidden_tag() }}
                             
@@ -103,6 +166,14 @@ textarea.form-control {
                                 {{ form.email(class="form-control", id="email", placeholder="name@example.com") }}
                                 {{ form.email.label(for="email") }}
                                 {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="feedback_type" class="form-label">Type of Feedback</label>
+                                {{ form.feedback_type(class="form-select", id="feedback_type") }}
+                                {% for error in form.feedback_type.errors %}
                                     <div class="invalid-feedback d-block">{{ error }}</div>
                                 {% endfor %}
                             </div>

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
 from models import User
 from email_validator import validate_email, EmailNotValidError
@@ -36,6 +36,15 @@ class ResetPasswordForm(FlaskForm):
 class FeedbackForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(), Length(min=2, max=50)])
     email = StringField('Email', validators=[DataRequired(), Email()])
+    feedback_type = SelectField('Feedback Type', 
+        choices=[
+            ('bug', 'Report a Bug'),
+            ('suggestion', 'Feature Suggestion'),
+            ('improvement', 'Improvement Idea'),
+            ('other', 'Other')
+        ],
+        validators=[DataRequired()]
+    )
     subject = StringField('Subject', validators=[DataRequired(), Length(min=5, max=100)])
     message = TextAreaField('Message', validators=[DataRequired(), Length(min=10, max=1000)])
     submit = SubmitField('Send Feedback')
