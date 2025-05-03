@@ -1,6 +1,6 @@
 # Keep your existing imports
 from flask import Flask, render_template, flash, redirect, url_for,jsonify, session, request
-from forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm
+from forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm, FeedbackForm
 # --- Import Resource model ---
 from models import db, User, Resource
 from flask_bcrypt import Bcrypt
@@ -28,6 +28,10 @@ if database_url:
     if database_url.startswith('postgres://'):
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    # Log database connection details (without password)
+    db_info = database_url.split('@')
+    if len(db_info) > 1:
+        print(f"Connected to database at: {db_info[1]}")
 else:
     print("Warning: DATABASE_URL not set, using default SQLite database")
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
@@ -67,14 +71,21 @@ init_db()
 
 oauth = OAuth()
 oauth.init_app(app)
-google=oauth.register(
+
+# Check if OAuth credentials are set
+if not os.environ.get('GOOGLE_CLIENT_ID') or not os.environ.get('GOOGLE_CLIENT_SECRET'):
+    print("Warning: Google OAuth credentials not set. Please set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.")
+
+google = oauth.register(
     name='google',
     client_id=os.environ.get('GOOGLE_CLIENT_ID'),
     client_secret=os.environ.get('GOOGLE_CLIENT_SECRET'),
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={
-        'scope': 'openid profile email',
-        'response_type': 'code'
+        'scope': 'openid email profile',
+        'prompt': 'select_account',
+        'response_type': 'code',
+        'access_type': 'offline'
     }
 )
 
@@ -418,34 +429,64 @@ def chat_assistant():
 
 @app.route('/login/google')
 def login_google():
-    redirect_uri = url_for('authorize_google', _external=True)
-    return google.authorize_redirect(redirect_uri)
+    try:
+        # Get the base URL from environment variable or use the request's URL
+        base_url = os.environ.get('RENDER_EXTERNAL_URL', request.url_root.rstrip('/'))
+        redirect_uri = f"{base_url}/authorize/google"
+        print(f"Redirect URI: {redirect_uri}")  # Debug log
+        return google.authorize_redirect(redirect_uri)
+    except Exception as e:
+        print(f"Error in login_google: {e}")  # Debug log
+        flash('Error initiating Google login. Please try again.', 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/authorize/google')
 def authorize_google():
-    token = google.authorize_access_token()
-    userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
-    
-    # Check if user exists
-    user = User.query.filter_by(email=userinfo.json()['email']).first()
-    
-    if not user:
-        # Create new user
-        user = User(
-            username=userinfo.json()['email'].split('@')[0],  # Use email prefix as username
-            email=userinfo.json()['email'],
-            password=''  # No password needed for OAuth users
-        )
-        db.session.add(user)
-        db.session.commit()
-    
-    # Log the user in
-    session['user_id'] = user.id
-    session['username'] = user.username
-    session['log_in'] = True
-    
-    flash('Login Successful', 'success')
-    return redirect(url_for('dashboard'))
+    try:
+        token = google.authorize_access_token()
+        if not token:
+            flash('Failed to get access token from Google.', 'danger')
+            return redirect(url_for('login'))
+            
+        userinfo = google.get('https://www.googleapis.com/oauth2/v3/userinfo')
+        if not userinfo:
+            flash('Failed to get user information from Google.', 'danger')
+            return redirect(url_for('login'))
+            
+        user_data = userinfo.json()
+        email = user_data.get('email')
+        
+        if not email:
+            flash('Email not provided by Google.', 'danger')
+            return redirect(url_for('login'))
+            
+        # Check if user exists
+        user = User.query.filter_by(email=email).first()
+        
+        if not user:
+            # Create new user
+            username = email.split('@')[0]
+            user = User(
+                username=username,
+                email=email,
+                password=''  # No password needed for OAuth users
+            )
+            db.session.add(user)
+            db.session.commit()
+            flash('Account created successfully!', 'success')
+        
+        # Log the user in
+        session['user_id'] = user.id
+        session['username'] = user.username
+        session['log_in'] = True
+        
+        flash('Login Successful', 'success')
+        return redirect(url_for('dashboard'))
+        
+    except Exception as e:
+        print(f"Error in authorize_google: {e}")  # Debug log
+        flash('Error during Google authentication. Please try again.', 'danger')
+        return redirect(url_for('login'))
 
 @app.route('/password_reset', methods=['GET', 'POST'])
 def password_reset():
@@ -516,6 +557,40 @@ def reset_password(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('login'))
     return render_template('reset_password.html', form=form)
+
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    form = FeedbackForm()
+    if form.validate_on_submit():
+        try:
+            # Create email message
+            msg = Message(
+                'New Feedback from Study Organizer',
+                sender=app.config['MAIL_USERNAME'],
+                recipients=['abhishekhiremath0424@gmail.com']
+            )
+            
+            # Format email body
+            msg.body = f'''
+            New Feedback Received:
+            
+            Name: {form.name.data}
+            Email: {form.email.data}
+            Subject: {form.subject.data}
+            Message: {form.message.data}
+            
+            Sent from: {request.remote_addr}
+            '''
+            
+            # Send email
+            mail.send(msg)
+            flash('Thank you for your feedback! We will get back to you soon.', 'success')
+            return redirect(url_for('home'))
+        except Exception as e:
+            print(f"Error sending feedback email: {e}")
+            flash('There was an error sending your feedback. Please try again later.', 'danger')
+    
+    return render_template('feedback.html', form=form)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000) # Running on port 5000

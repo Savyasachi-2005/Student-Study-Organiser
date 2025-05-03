@@ -1,0 +1,134 @@
+{% extends 'layout.html' %}
+
+{% block styles %}
+{{ super() }}
+<style>
+.feedback-page {
+    min-height: calc(100vh - 180px);
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2C5282 100%);
+    padding: 2rem 0;
+}
+
+.feedback-card {
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-header {
+    text-align: center;
+    padding: 2rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.feedback-header i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.feedback-form {
+    padding: 2rem;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--primary-color);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(74, 144, 226, 0.25);
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    transition: all 0.3s ease;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background: #2C5282;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+}
+
+@media (max-width: 768px) {
+    .feedback-page {
+        padding: 1rem 0;
+    }
+    
+    .feedback-card {
+        margin: 0 1rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feedback-page py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0 feedback-card">
+                    <div class="feedback-header">
+                        <i class="fas fa-comment-alt fa-3x text-primary mb-3"></i>
+                        <h1 class="h3 mb-3 fw-bold">Send Us Feedback</h1>
+                        <p class="text-muted">We'd love to hear from you! Share your thoughts and suggestions.</p>
+                    </div>
+                    
+                    <div class="feedback-form">
+                        <form method="post" class="needs-validation" novalidate>
+                            {{ form.hidden_tag() }}
+                            
+                            <div class="form-floating mb-3">
+                                {{ form.name(class="form-control", id="name", placeholder="Your Name") }}
+                                {{ form.name.label(for="name") }}
+                                {% for error in form.name.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                {{ form.email(class="form-control", id="email", placeholder="name@example.com") }}
+                                {{ form.email.label(for="email") }}
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="form-floating mb-3">
+                                {{ form.subject(class="form-control", id="subject", placeholder="Subject") }}
+                                {{ form.subject.label(for="subject") }}
+                                {% for error in form.subject.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="form-floating mb-4">
+                                {{ form.message(class="form-control", id="message", placeholder="Your Message") }}
+                                {{ form.message.label(for="message") }}
+                                {% for error in form.message.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            {{ form.submit(class="btn btn-primary w-100 py-2") }}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
