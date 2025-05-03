@@ -24,14 +24,14 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'ABHISHEKHIREMATH0424200
 
 # Database configuration
 database_url = os.environ.get('DATABASE_URL')
-if not database_url:
-    raise RuntimeError("DATABASE_URL environment variable is not set")
+if database_url:
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    print("Warning: DATABASE_URL not set, using default SQLite database")
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 
-# Ensure the database URL is in the correct format
-if database_url.startswith('postgres://'):
-    database_url = database_url.replace('postgres://', 'postgresql://', 1)
-
-app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration

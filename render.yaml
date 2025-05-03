@@ -6,7 +6,6 @@ services:
       pip install -r requirements.txt
       export FLASK_APP=app.py
       export FLASK_ENV=production
-      export DATABASE_URL=${DATABASE_URL}
       flask db upgrade
     startCommand: gunicorn app:app
     envVars:
@@ -21,7 +20,7 @@ services:
           name: flask-auth-db
           property: connectionString
       - key: SECRET_KEY
-        generateValue: true
+        value: ABHISHEKHIREMATH04242005
       - key: MAIL_SERVER
         value: smtp.gmail.com
       - key: MAIL_PORT
