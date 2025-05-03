@@ -1,0 +1,62 @@
+/* --- Feature Card Styling (Place in components.css or similar) --- */
+
+/* Optional: Container for the feature cards if they are in a grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive columns */
+    gap: 2rem; /* Space between cards */
+    margin-top: 2rem; /* Space above the grid */
+    margin-bottom: 2rem; /* Space below the grid */
+}
+
+.feature-card {
+    background-color: #fff;
+    padding: 2rem 1.5rem; /* Padding inside the card */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06); /* Subtle shadow */
+    text-align: center; /* Center content */
+    border: 1px solid #e9ecef; /* Light border */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+}
+
+.feature-card:hover {
+    transform: translateY(-5px); /* Lift card on hover */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
+}
+
+.feature-icon {
+    font-size: 2.5rem; /* Size of the icon */
+    margin-bottom: 1.25rem; /* Space below the icon */
+    display: inline-block; /* Needed for margin */
+}
+
+/* Specific icon color for the Categorize card */
+.feature-card .fa-tags { /* Target the specific icon */
+    color: #ffc107; /* Vibrant yellow - often associated with tags/notes */
+    /* Alternative: Choose another distinct color like #fd7e14 (orange) or #20c997 (teal) */
+}
+/* Example: Color for the Link icon in another card */
+.feature-card .fa-link {
+    color: #0d6efd; /* Primary blue */
+}
+
+
+.feature-card h3 {
+    font-size: 1.3rem; /* Heading size */
+    font-weight: 600;
+    color: #333; /* Dark heading color */
+    margin-top: 0; /* Remove default margin */
+    margin-bottom: 0.75rem; /* Space below heading */
+}
+
+.feature-card p {
+    font-size: 0.95rem; /* Text size */
+    color: #555; /* Slightly muted text color */
+    line-height: 1.5; /* Spacing between lines */
+    margin-bottom: 0; /* Remove bottom margin if no button follows */
+}
+
+/* Optional: Add margin-top to buttons within feature cards if needed */
+.feature-card .btn {
+    margin-top: 1.5rem;
+}

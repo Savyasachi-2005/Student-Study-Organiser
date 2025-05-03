@@ -1,0 +1,158 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="hero-section text-center py-5 fade-in">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-4">Study Resource Organizer</h1>
+        <p class="lead text-muted mb-5">Organize, track, and optimize your learning journey in one place</p>
+        
+        {% if not session.log_in %}
+        <div class="cta-buttons mb-5">
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-sign-in-alt me-2"></i>Get Started
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-user-plus me-2"></i>Create Account
+            </a>
+        </div>
+        {% else %}
+        <div class="cta-buttons mb-5">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="features-section py-5 bg-light">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for('add_resource') }}'">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fas fa-link fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Store Resources</h3>
+                        <p class="text-muted mb-0">Easily save and organize your learning materials in one central location.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for('categories') }}'">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fas fa-tags fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Smart Categories</h3>
+                        <p class="text-muted mb-0">Organize content by subject, difficulty level, or custom tags.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 feature-card" onclick="goToDashboardAndScroll()">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fas fa-search fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Quick Search</h3>
+                        <p class="text-muted mb-0">Find exactly what you need with powerful search and filter options.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for('track_progress') }}'">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon-wrapper mb-3">
+                            <i class="fas fa-check-circle fa-2x text-primary"></i>
+                        </div>
+                        <h3 class="h5 mb-3">Progress Tracking</h3>
+                        <p class="text-muted mb-0">Monitor your learning progress and celebrate achievements.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="benefits-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose Study Resource Organizer?</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-clock fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Save Time</h3>
+                    <p class="text-muted">Spend less time organizing and more time learning with our efficient system.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Learn Better</h3>
+                    <p class="text-muted">Structured organization helps you retain information more effectively.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="text-center">
+                    <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                    <h3 class="h5">Track Growth</h3>
+                    <p class="text-muted">Visualize your progress and stay motivated throughout your journey.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function goToDashboardAndScroll() {
+    localStorage.setItem("scrollToSearch", "true");
+    window.location.href = '{{url_for('dashboard')}}';
+}
+</script>
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #2C5282 100%);
+    color: white;
+    padding: 5rem 0;
+    margin-top: -3rem;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+.feature-icon-wrapper {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: var(--light-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.feature-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+}
+
+.benefits-section {
+    background-color: var(--light-color);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 3rem 0;
+        clip-path: polygon(0 0, 100% 0, 100% 95%, 0 100%);
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Resource - Study Resource Organizer{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_rec.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Edit Study Resource</h2>
+    <hr>
+
+    {# Display flashed messages if any #}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('edit_resource', resource_id=resource.id) }}">
+        <div class="mb-3">
+            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="title" name="title" value="{{ resource.title }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3">{{ resource.description }}</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label for="url" class="form-label">URL <span class="text-danger">*</span></label>
+            <input type="url" class="form-control" id="url" name="url" value="{{ resource.url }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="subject" class="form-label">Subject</label>
+            <input type="text" class="form-control" id="subject" name="subject" value="{{ resource.subject }}">
+        </div>
+
+        <div class="mb-3">
+            <label for="difficulty" class="form-label">Difficulty</label>
+            <select class="form-select" id="difficulty" name="difficulty">
+                <option value="">Choose...</option>
+                <option value="beginner" {% if resource.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
+                <option value="intermediate" {% if resource.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
+                <option value="advanced" {% if resource.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="tags" class="form-label">Tags (comma-separated)</label>
+            <input type="text" class="form-control" id="tags" name="tags" value="{{ resource.tags }}" placeholder="e.g., python, webdev, tutorial">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update Resource</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %} 

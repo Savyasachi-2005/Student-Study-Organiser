@@ -1,0 +1,327 @@
+/* Form Container with Glass Effect */
+.container {
+    max-width: 800px; /* Slightly wider container */
+    background: rgba(255, 255, 255, 0.97); /* More opaque for better readability */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    padding: 3rem; /* Increased padding */
+    border-radius: 18px; /* Slightly more rounded */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12); /* Enhanced shadow */
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    margin: 3rem auto; /* More vertical space */
+    animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform: translateY(40px);
+    opacity: 0;
+}
+
+/* Enhanced Spacing Between Form Groups */
+.mb-3 {
+    margin-bottom: 1.8rem; /* More space between form fields */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Enhanced Form Elements */
+.form-control, .form-select {
+    border: 2px solid #e9ecef;
+    border-radius: 12px; /* More rounded corners */
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    background-color: #f8fafc;
+    padding: 0.9rem 1.1rem; /* More padding inside inputs */
+    font-size: 1rem; /* Consistent font size */
+    line-height: 1.5;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4a85f6;
+    box-shadow: 0 0 0 0.25rem rgba(74, 133, 246, 0.15);
+    background-color: #fff;
+    transform: translateY(-3px); /* Slightly more movement on focus */
+}
+
+/* Improved Label Spacing */
+.form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.75rem; /* More space between label and input */
+    display: inline-block;
+    transition: color 0.3s ease;
+    font-size: 1.05rem; /* Slightly larger labels */
+}
+
+/* Textarea Enhancements */
+textarea.form-control {
+    resize: vertical;
+    min-height: 120px; /* Taller textarea */
+    line-height: 1.6; /* Better line spacing for readability */
+}
+
+/* Enhanced Button Spacing and Size */
+.btn {
+    padding: 0.9rem 2.5rem; /* Larger buttons */
+    border-radius: 12px; /* Match input radius */
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    margin-right: 1rem; /* More space between buttons */
+    margin-top: 1rem; /* Space above buttons */
+    font-size: 1.05rem; /* Slightly larger text */
+}
+
+/* Improved Button Group Spacing */
+.form-actions {
+    margin-top: 2.5rem; /* More space above button group */
+    display: flex;
+    align-items: center;
+}
+
+/* Enhanced Title */
+h2 {
+    position: relative;
+    display: inline-block;
+    color: #2c3e50;
+    opacity: 0;
+    animation: fadeInDown 0.8s ease forwards;
+    animation-delay: 0.3s;
+    font-size: 2.2rem; /* Larger title */
+    margin-bottom: 1.5rem; /* More space below title */
+    font-weight: 700; /* Bolder title */
+    text-align: center; /* Center title */
+    width: 100%; /* Full width to center properly */
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -12px; /* Lower underline */
+    left: 25%; /* Center the underline */
+    width: 0;
+    height: 4px; /* Thicker underline */
+    background: linear-gradient(to right, #4a85f6, #3c6fd1);
+    animation: expandWidth 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    animation-delay: 0.8s;
+    border-radius: 4px; /* Rounded underline */
+}
+
+@keyframes expandWidth {
+    to {
+        width: 50%; /* Only expand to half the width for a centered look */
+    }
+}
+
+/* Enhanced Horizontal Rule */
+hr {
+    border-color: #e9ecef;
+    margin: 2rem 0; /* More space around the divider */
+    opacity: 0;
+    animation: fadeIn 0.5s ease forwards;
+    animation-delay: 0.5s;
+    height: 2px; /* Thicker line */
+    background: linear-gradient(to right, rgba(74, 133, 246, 0.1), rgba(74, 133, 246, 0.3), rgba(74, 133, 246, 0.1)); /* Gradient hr */
+    border: none;
+}
+
+/* Improved Alert Spacing */
+.alert {
+    padding: 1.25rem 1.5rem; /* More padding in alerts */
+    margin-bottom: 2rem; /* More space below alerts */
+    border-radius: 12px; /* Match other elements */
+    animation: slideDown 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+    transform-origin: top center;
+    border-left: 5px solid; /* Thicker left border */
+}
+
+/* Improved Required Field Indicator */
+.text-danger {
+    animation: pulse 2s infinite;
+    display: inline-block;
+    margin-left: 0.25rem; /* Space between label text and asterisk */
+    font-size: 1.2rem; /* Larger asterisk */
+}
+
+/* Improved Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 2rem; /* Less padding on smaller screens */
+        margin: 1.5rem auto;
+        width: 90%;
+    }
+    
+    .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 1rem;
+        margin-right: 0;
+    }
+    
+    h2 {
+        font-size: 1.8rem; /* Smaller title on mobile */
+    }
+    
+    .form-label {
+        font-size: 1rem;
+    }
+    
+    .form-control, .form-select {
+        padding: 0.8rem 1rem;
+    }
+}
+
+/* Even smaller screens */
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem;
+        border-radius: 14px;
+    }
+    
+    h2 {
+        font-size: 1.6rem;
+    }
+    
+    .mb-3 {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Add subtle background pattern with improved contrast */
+body {
+    background-color: #f0f4f8; /* Slightly darker for better contrast */
+    background-image: url("data:image/svg+xml,%3Csvg width='30' height='30' viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 15h15v15H0V15z' fill='%234a85f6' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem; /* Add some padding to the body */
+}
+
+/* Create a wrapper for buttons at the bottom */
+.form-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Add smooth auto-scroll for users with many form fields */
+html {
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: #4a85f6 #f0f4f8;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f4f8;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #4a85f6;
+    border-radius: 20px;
+}
+/* Add these animation keyframes at the end of your file */
+
+/* Missing Animation Keyframes */
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-15px) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+}
+
+/* Fix for animation sequence */
+.mb-3:nth-child(1) { animation-delay: 0.1s; }
+.mb-3:nth-child(2) { animation-delay: 0.2s; }
+.mb-3:nth-child(3) { animation-delay: 0.3s; }
+.mb-3:nth-child(4) { animation-delay: 0.4s; }
+.mb-3:nth-child(5) { animation-delay: 0.5s; }
+.mb-3:nth-child(6) { animation-delay: 0.6s; }
+.mb-3:nth-child(7) { animation-delay: 0.7s; }
+
+/* Fix container layout issues if extending layout */
+.container {
+    max-width: 800px !important; /* Override any Bootstrap defaults */
+    width: 90% !important;
+    padding: 3rem !important;
+    margin: 3rem auto !important;
+    opacity: 1 !important; /* Ensure visibility even if animations don't work */
+}
+
+/* Force body to render properly */
+body {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+}
+
+/* Ensure form elements are visible */
+.form-control, .form-select, .btn, h2, hr, .form-label {
+    opacity: 1 !important; /* Fallback if animations don't work */
+}

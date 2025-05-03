@@ -1,0 +1,216 @@
+{% extends 'layout.html' %}
+
+{% block title %}Categorize & Filter Resources{% endblock %}
+
+{% block styles %}
+    {# Optional: Link a specific CSS file if needed #}
+    {# <link rel="stylesheet" href="{{ url_for('static', filename='css/categorize.css') }}"> #}
+    <style>
+        /* Basic styles for filters and cards */
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .filter-group label {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            color: #555;
+        }
+        .filter-group select, .filter-group input {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            min-width: 150px;
+            background-color: #fff;
+        }
+        #clear-filters-btn {
+            margin-left: auto; /* Push clear button to the right */
+        }
+
+        /* Use dashboard grid/card styles if available, or define basic ones */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .resource-card {
+             background-color: #fff;
+             border-radius: 8px;
+             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+             overflow: hidden; /* Ensure content stays within borders */
+             display: flex;
+             flex-direction: column;
+             transition: transform 0.2s ease;
+        }
+         .resource-card:hover {
+             transform: translateY(-3px);
+         }
+        .resource-details { padding: 1rem 1.25rem; flex-grow: 1; }
+        .resource-title { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .resource-description { font-size: 0.9rem; color: #666; margin-bottom: 1rem; }
+        .resource-metadata { font-size: 0.85rem; color: #777; margin-bottom: 0.5rem; }
+        .resource-tags .tag { display: inline-block; background-color: #e9ecef; color: #495057; padding: 0.2rem 0.5rem; border-radius: 10px; font-size: 0.75rem; margin: 0.2rem; }
+        .resource-actions { padding: 0.75rem 1.25rem; border-top: 1px solid #eee; background-color: #fcfdff; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="section-title">Categorize & Filter Resources</h1>
+
+    <!-- Filter Controls -->
+    <section class="filter-section content-section"> {# Use content-section for consistent styling #}
+        <div class="filter-group">
+            <label for="subject-filter">Filter by Subject:</label>
+            <select id="subject-filter" class="form-select form-select-sm">
+                <option value="">All Subjects</option>
+                {% for subject in subjects %}
+                <option value="{{ subject }}">{{ subject }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="difficulty-filter">Filter by Difficulty:</label>
+            <select id="difficulty-filter" class="form-select form-select-sm">
+                <option value="">All Difficulties</option>
+                {% for difficulty in difficulties %}
+                <option value="{{ difficulty }}">{{ difficulty|capitalize }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="tag-filter">Filter by Tag:</label>
+            <input type="text" id="tag-filter" class="form-control form-control-sm" placeholder="Enter a tag...">
+            {# Alternatively, use a datalist or select for distinct tags #}
+            {# <select id="tag-filter" class="form-select form-select-sm">
+                <option value="">All Tags</option>
+                {% for tag in tags %}
+                <option value="{{ tag }}">{{ tag }}</option>
+                {% endfor %}
+            </select> #}
+        </div>
+
+        <button id="clear-filters-btn" class="btn btn-sm btn-outline-secondary">Clear Filters</button>
+    </section>
+
+    <!-- Resource Display Area -->
+    <section class="resources-grid" id="resources-list">
+        {% if resources %}
+            {% for resource in resources %}
+            <div class="resource-card"
+                 data-subject="{{ resource.subject|default('', true)|lower }}"
+                 data-difficulty="{{ resource.difficulty|default('', true)|lower }}"
+                 data-tags="{{ resource.tags|default('', true)|lower }}"> {# Store filterable data #}
+
+                <div class="resource-details">
+                    <h3 class="resource-title">{{ resource.title }}</h3>
+                    {% if resource.description %}
+                        <p class="resource-description">{{ resource.description|truncate(100) }}</p>
+                    {% endif %}
+                    <div class="resource-metadata">
+                        {% if resource.subject %}
+                            <span><strong>Subject:</strong> {{ resource.subject }}</span> |
+                        {% endif %}
+                        {% if resource.difficulty %}
+                            <span><strong>Difficulty:</strong> {{ resource.difficulty|capitalize }}</span> |
+                        {% endif %}
+                         <span>Added: {{ resource.date_added.strftime('%Y-%m-%d') }}</span>
+                    </div>
+                    {% if resource.tags %}
+                    <div class="resource-tags">
+                        <strong>Tags:</strong>
+                        {% for tag in resource.get_tags_list() %}
+                            <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="resource-actions">
+                    <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Visit</a>
+                    <a href="{{ url_for('edit_resource', resource_id=resource.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                    {# Add other actions if needed #}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state content-section"> {# Use content-section for styling #}
+                <h2>No resources found.</h2>
+                <p>Add your first study resource to get started!</p>
+                <a href="{{ url_for('add_resource') }}" class="btn btn-primary">Add Resource</a>
+            </div>
+        {% endif %}
+    </section>
+     <p id="no-results-message" style="display: none; text-align: center; margin-top: 2rem; color: #6c757d;">No resources match the current filters.</p>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const subjectFilter = document.getElementById('subject-filter');
+        const difficultyFilter = document.getElementById('difficulty-filter');
+        const tagFilter = document.getElementById('tag-filter');
+        const resourceList = document.getElementById('resources-list');
+        const resourceCards = resourceList.querySelectorAll('.resource-card');
+        const clearButton = document.getElementById('clear-filters-btn');
+        const noResultsMessage = document.getElementById('no-results-message');
+
+        function filterResources() {
+            const selectedSubject = subjectFilter.value.toLowerCase();
+            const selectedDifficulty = difficultyFilter.value.toLowerCase();
+            const selectedTag = tagFilter.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            resourceCards.forEach(card => {
+                const subject = card.dataset.subject;
+                const difficulty = card.dataset.difficulty;
+                const tags = card.dataset.tags; // Comma-separated tags, already lowercase
+
+                const subjectMatch = !selectedSubject || subject === selectedSubject;
+                const difficultyMatch = !selectedDifficulty || difficulty === selectedDifficulty;
+                // Check if any tag in the comma-separated list contains the filter tag text
+                const tagMatch = !selectedTag || tags.split(',').some(tag => tag.trim().includes(selectedTag));
+
+
+                if (subjectMatch && difficultyMatch && tagMatch) {
+                    card.style.display = ''; // Show card
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none'; // Hide card
+                }
+            });
+             noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+
+        function clearFilters() {
+            subjectFilter.value = '';
+            difficultyFilter.value = '';
+            tagFilter.value = '';
+            filterResources(); // Re-apply filters (which will now show all)
+        }
+
+        // Add event listeners
+        subjectFilter.addEventListener('change', filterResources);
+        difficultyFilter.addEventListener('change', filterResources);
+        tagFilter.addEventListener('input', filterResources); // Filter as user types for tags
+        clearButton.addEventListener('click', clearFilters);
+
+        // Initial filter application in case of pre-filled values (less likely here)
+        // filterResources();
+    });
+</script>
+{% endblock %}

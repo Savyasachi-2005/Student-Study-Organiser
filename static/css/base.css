@@ -1,0 +1,423 @@
+/* --- static/css/base.css --- */
+html {
+    box-sizing: border-box;
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+/* Custom Variables */
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #6C757D;
+    --success-color: #28A745;
+    --danger-color: #DC3545;
+    --warning-color: #FFC107;
+    --info-color: #17A2B8;
+    --light-color: #F8F9FA;
+    --dark-color: #343A40;
+    --body-bg: #F5F7FA;
+    --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--dark-color);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px; /* Adjust based on actual navbar height to prevent overlap */
+}
+
+/* --- Navbar Styling --- */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    position: fixed; /* Changed to fixed */
+    top: 0;
+    left: 0;
+    right: 0; /* Ensure it spans full width */
+    height: 60px; /* Fixed height */
+    z-index: 1030; /* High z-index */
+}
+
+.nav-left .app-logo { /* Style the logo link */
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: #0d6efd;
+    text-decoration: none; /* Ensure no underline */
+}
+.nav-left .app-logo:hover {
+     color: #0a58ca; /* Darker on hover */
+}
+
+.nav-right {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 1.5rem;
+}
+
+.nav-right a, .nav-logout-btn { /* Apply similar base style to links and button */
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    position: relative;
+    transition: color 0.2s ease;
+    background: none; /* Reset button background */
+    border: none; /* Reset button border */
+    cursor: pointer; /* Pointer for button */
+    font-size: 1rem; /* Match link font size */
+    font-family: inherit; /* Use body font */
+}
+
+.nav-right a:hover, .nav-logout-btn:hover {
+    color: #0d6efd;
+}
+
+/* Underline effect for actual links only */
+.nav-right a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #0d6efd;
+    transition: width 0.3s ease;
+}
+
+.nav-right a:hover::after {
+    width: 100%;
+}
+
+.nav-logout-btn {
+    padding: 0.3rem 0.6rem; /* Give button slight padding if needed */
+     border: 1px solid transparent; /* Add border for potential hover/focus */
+     border-radius: 4px;
+}
+.nav-logout-btn:hover {
+    /* Optional: Add subtle background or border */
+     /* background-color: #e9ecef; */
+     color: #dc3545; /* Red color for logout */
+}
+
+/* --- Main Content Area --- */
+main {
+    flex: 1 0 auto; /* Allows main to grow and push footer down */
+    padding-top: 2rem; /* Space below fixed navbar */
+    padding-bottom: 2rem; /* Space above footer */
+    width: 100%;
+}
+
+/* --- Container (for content width constraint) --- */
+.container {
+    width: 100%;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 1200px; /* Max width for general content */
+}
+/* Optional: Smaller container for forms */
+.container-narrow {
+    max-width: 800px;
+}
+
+/* --- Flash Messages Container --- */
+.flash-message-container {
+    padding-top: 1rem; /* Add space if directly below navbar */
+}
+
+/* --- Alert Messages (Keep or merge with components.css) --- */
+/* These styles are fine, ensure they don't conflict badly with components.css alerts */
+/* If using Bootstrap JS for dismiss, ensure .alert-dismissible, .fade, .show classes work */
+.alert {
+    padding: 0.9rem 1.25rem;
+    margin-bottom: 1rem; /* Spacing between alerts */
+    border-radius: 6px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    position: relative;
+    /* Optional entry animation */
+    /* animation: slideDown 0.4s ease-out forwards; */
+}
+/* Add dismiss button styling if needed and not using Bootstrap */
+.alert .btn-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    padding: 0.5rem;
+    /* background: none; border: none; font-size: 1.2rem; */
+}
+
+/* Specific alert colors from your original CSS */
+.alert-success { background-color: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+.alert-danger { background-color: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+.alert-warning { background-color: #fff3cd; color: #856404; border-left: 4px solid #ffc107; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; border-left: 4px solid #17a2b8; }
+
+/* --- Footer Styling --- */
+footer {
+    flex-shrink: 0; /* Prevent footer from shrinking */
+    text-align: center;
+    padding: 1.5rem 0;
+    background-color: #e9ecef;
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: auto; /* Pushes footer down if content is short */
+    border-top: 1px solid #dee2e6;
+}
+
+/* --- Basic Typography (can be extended) --- */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--dark-color);
+    margin-top: 0;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+a { /* Base link style (override in specific components like navbar if needed) */
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: darken(var(--primary-color), 10%);
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 992px) {
+     body { padding-top: 0; } /* Remove padding if navbar layout changes drastically */
+     .navbar {
+         position: static; /* Unstick navbar */
+         /* Or keep fixed and implement mobile toggle menu */
+     }
+     main { padding-top: 1rem; } /* Adjust main padding if navbar is static */
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        padding: 0.75rem 0;
+        flex-direction: column;
+        gap: 0.75rem;
+        height: auto; /* Allow height to adjust */
+        position: static; /* Ensure it's static */
+    }
+     body { padding-top: 0; } /* No top padding needed */
+     main { padding-top: 1rem; }
+
+    .nav-right {
+        gap: 1rem;
+        width: 100%;
+        justify-content: center; /* Center items horizontally */
+    }
+
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    h1 {
+        font-size: 2rem;
+    }
+    
+    h2 {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-right {
+        flex-direction: column;
+        align-items: stretch; /* Make items full width */
+        gap: 0.5rem;
+    }
+
+    .nav-right a, .nav-logout-btn {
+        text-align: center;
+        padding: 0.75rem; /* Larger touch target */
+        border-radius: 4px;
+    }
+
+    .nav-right a::after {
+        display: none; /* Hide underline on mobile stacked links */
+    }
+
+    .nav-right a:hover, .nav-logout-btn:hover {
+        background-color: #e9ecef; /* Add background on hover for touch feedback */
+    }
+    .nav-logout-btn:hover {
+        color: #dc3545; /* Keep logout color distinct */
+        background-color: #f8d7da;
+    }
+}
+
+/* Buttons */
+.btn {
+    font-weight: 500;
+    padding: 0.5rem 1.25rem;
+    border-radius: 0.375rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: darken(var(--primary-color), 10%);
+    border-color: darken(var(--primary-color), 10%);
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Forms */
+.form-control {
+    border-radius: 0.375rem;
+    border: 1px solid #E2E8F0;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+}
+
+/* Toast Notifications */
+.toast {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toast.bg-success {
+    background-color: var(--success-color) !important;
+}
+
+.toast.bg-danger {
+    background-color: var(--danger-color) !important;
+}
+
+.toast.bg-warning {
+    background-color: var(--warning-color) !important;
+}
+
+.toast.bg-info {
+    background-color: var(--info-color) !important;
+}
+
+/* Navigation */
+.navbar-brand {
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.nav-link {
+    font-weight: 500;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Footer */
+footer {
+    border-top: 1px solid #E2E8F0;
+}
+
+footer a:hover {
+    color: var(--primary-color) !important;
+}
+
+/* Utility Classes */
+.shadow-sm {
+    box-shadow: var(--card-shadow) !important;
+}
+
+.bg-light {
+    background-color: var(--light-color) !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Components */
+.resource-card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-2px);
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    background-color: var(--light-color);
+    color: var(--secondary-color);
+    font-size: 0.875rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.progress-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.progress-badge.not-started {
+    background-color: var(--light-color);
+    color: var(--secondary-color);
+}
+
+.progress-badge.in-progress {
+    background-color: var(--info-color);
+    color: white;
+}
+
+.progress-badge.completed {
+    background-color: var(--success-color);
+    color: white;
+}

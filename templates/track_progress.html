@@ -1,0 +1,606 @@
+{% extends 'layout.html' %}
+
+{% block title %}Track Progress - Study Resource Organizer{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/track_progress.css') }}">
+    <style>
+        .hero-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.2)" stroke-width="2" fill="none"/></svg>') repeat;
+            opacity: 0.3;
+            animation: float 20s linear infinite;
+        }
+
+        @keyframes float {
+            from { transform: translateY(0) rotate(0deg); }
+            to { transform: translateY(-100px) rotate(360deg); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(to right, #ffffff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.08);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .flash-cards-section {
+            position: relative;
+            padding: 1rem 0;
+        }
+
+        .flash-card {
+            perspective: 1000px;
+            height: 250px;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .flash-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        .flash-card:hover .flash-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flash-card-front, .flash-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            padding: 1.5rem;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .flash-card-front {
+            background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        }
+
+        .flash-card-back {
+            background: linear-gradient(145deg, #f8f9fa 0%, #ffffff 100%);
+            transform: rotateY(180deg);
+        }
+
+        .flash-card-icon {
+            font-size: 2rem;
+            color: #4A90E2;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .flash-card:hover .flash-card-icon {
+            transform: scale(1.1);
+        }
+
+        .flash-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+
+        .flash-card-subject {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .flash-card-description {
+            font-size: 0.95rem;
+            color: #495057;
+            overflow-y: auto;
+            max-height: 120px;
+            padding: 0.5rem;
+            text-align: left;
+            margin-bottom: 1rem;
+        }
+
+        .flash-card-description::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .flash-card-description::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 2px;
+        }
+
+        .flash-card-description::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 2px;
+        }
+
+        .flash-card-link {
+            margin-top: auto;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, #6B73FF, transparent);
+        }
+
+        .timeline-item {
+            margin-bottom: 2rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .timeline-item.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .resources-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .filter-btn {
+            border-radius: 20px;
+            padding: 0.5rem 1.25rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .filter-btn.active {
+            transform: scale(1.05);
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .resource-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .resource-icon:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Your Learning Journey</h1>
+            <p class="hero-subtitle">Track your progress and celebrate your achievements</p>
+        </div>
+                </div>
+            </div>
+
+<div class="container">
+    <!-- Progress Summary Section -->
+    <div class="progress-summary mb-5 animate-fadeInUp">
+            <div class="row g-4">
+            <!-- Completed Resources Card -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                    <div class="stat-icon bg-success-soft">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 class="stat-value" id="completed-resources">0</h3>
+                        <p class="stat-label">Completed Resources</p>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In Progress Card -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                    <div class="stat-icon bg-warning-soft">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 class="stat-value" id="inprogress-resources">0</h3>
+                            <p class="stat-label">In Progress</p>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Total Resources Card -->
+                <div class="col-md-4">
+                    <div class="stat-card">
+                    <div class="stat-icon bg-info-soft">
+                        <i class="fas fa-book"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3 class="stat-value" id="total-resources">0</h3>
+                            <p class="stat-label">Total Resources</p>
+                            <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section mb-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-pie me-2"></i>
+                        Overall Progress
+                    </h3>
+                        <canvas id="overallProgressChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                    <h3 class="chart-title">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Progress by Subject
+                    </h3>
+                        <canvas id="progressBySubjectChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Flash Cards Section -->
+    <div class="flash-cards-section mb-5">
+        <h2 class="h4 mb-4">
+            <i class="fas fa-layer-group me-2"></i>
+            Quick Review
+        </h2>
+        <div class="row g-4">
+            {% for resource in resources %}
+                {% if resource.status == 'Completed' %}
+                    {% if loop.index <= 3 %}
+                    <div class="col-md-4">
+                        <div class="flash-card">
+                            <div class="flash-card-inner">
+                                <div class="flash-card-front">
+                                    <i class="fas fa-bookmark flash-card-icon"></i>
+                                    <h5 class="flash-card-title">{{ resource.title }}</h5>
+                                    <p class="flash-card-subject">{{ resource.subject }}</p>
+                                </div>
+                                <div class="flash-card-back">
+                                    <div class="flash-card-description">
+                                        {{ resource.description or 'No description available' }}
+                                    </div>
+                                    <div class="flash-card-link">
+                                        <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-primary">
+                                            <i class="fas fa-external-link-alt me-1"></i> View Resource
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="activity-timeline mb-5">
+        <h2 class="h4 mb-4">
+            <i class="fas fa-history me-2"></i>
+            Recent Activity
+        </h2>
+        <div class="timeline">
+            {% for resource in resources|sort(attribute='last_updated', reverse=true) %}
+                {% if loop.index <= 5 %}
+                <div class="timeline-item">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="timeline-icon bg-{{ 'success' if resource.status == 'Completed' else 'warning' }} text-white">
+                                    <i class="fas fa-{{ 'check' if resource.status == 'Completed' else 'clock' }}"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h5 class="mb-1">{{ resource.title }}</h5>
+                                    <p class="text-muted mb-0">
+                                        <small>{{ resource.last_studied }}</small>
+                                    </p>
+                                </div>
+                                <span class="ms-auto badge bg-{{ 'success' if resource.status == 'Completed' else 'warning' }}">
+                                    {{ resource.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        </div>
+
+    <!-- Resources Table Section -->
+        <div class="resources-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 mb-0">
+                <i class="fas fa-list me-2"></i>
+                Resource Progress
+            </h2>
+                <div class="btn-group">
+                <button type="button" class="filter-btn btn btn-outline-primary active" data-filter="all">All</button>
+                <button type="button" class="filter-btn btn btn-outline-success" data-filter="completed">Completed</button>
+                <button type="button" class="filter-btn btn btn-outline-warning" data-filter="in-progress">In Progress</button>
+                <button type="button" class="filter-btn btn btn-outline-secondary" data-filter="not-started">Not Started</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Subject</th>
+                            <th>Progress</th>
+                            <th>Last Studied</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for resource in resources %}
+                    <tr data-status="{{ resource.status|lower }}" class="animate-fadeInUp" style="animation-delay: {{ loop.index * 0.1 }}s">
+                            <td>
+                                <div class="d-flex align-items-center">
+                                <div class="resource-icon bg-light me-3">
+                                        <i class="fas fa-{{ resource.icon }}"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-0">{{ resource.title }}</h6>
+                                        <small class="text-muted">{{ resource.type }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ resource.subject }}</td>
+                        <td style="width: 200px;">
+                            <div class="progress" style="height: 8px;">
+                                {% if resource.status == 'Completed' %}
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                                {% elif resource.status == 'In Progress' %}
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ resource.progress }}%"></div>
+                                    <div class="progress-bar bg-secondary opacity-25" role="progressbar" style="width: {{ 100 - resource.progress }}%"></div>
+                                {% else %}
+                                    <div class="progress-bar bg-secondary opacity-25" role="progressbar" style="width: 100%"></div>
+                                {% endif %}
+                            </div>
+                            <small class="mt-1 d-block text-center">
+                                    {% if resource.status == 'Completed' %}
+                                            Completed
+                                    {% elif resource.status == 'In Progress' %}
+                                            {{ resource.progress }}%
+                                    {% else %}
+                                            Not Started
+                                    {% endif %}
+                            </small>
+                            </td>
+                            <td>{{ resource.last_studied }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary update-progress" 
+                                        data-resource-id="{{ resource.id }}"
+                                        data-bs-toggle="tooltip" 
+                                        title="Update Progress">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+    </div>
+</div>
+
+<!-- Update Progress Modal -->
+<div class="modal fade" id="updateProgressModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">
+                    <i class="fas fa-tasks me-2"></i>
+                    Update Progress
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="progressForm">
+                    <input type="hidden" id="resourceId" name="resourceId">
+                    <div class="mb-4">
+                        <label for="progressSlider" class="form-label">Progress (%)</label>
+                        <input type="range" class="form-range" id="progressSlider" min="0" max="100">
+                        <div class="text-center mt-2">
+                            <span class="h4" id="progressValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status">
+                            <option value="not-started">Not Started</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Study Notes</label>
+                        <textarea class="form-control" id="notes" rows="3" placeholder="Add any notes about your progress..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-primary" id="saveProgress">
+                    <i class="fas fa-save me-2"></i>Save Progress
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pass resources data to JavaScript
+    window.flaskResources = {{ resources|tojson|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
+{% endblock %}

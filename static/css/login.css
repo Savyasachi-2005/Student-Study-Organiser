@@ -1,0 +1,362 @@
+/* Premium Login Page Styling - Integrated with Base Layout */
+/* Make sure base.css is loaded BEFORE this file */
+
+:root {
+    --primary-color: #4a6cf7;
+    --primary-hover: #3a5cd5;
+    --text-primary: #2d3748;
+    --text-secondary: #64748b;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --error-color: #e53e3e;
+    --success-color: #38a169;
+    --input-bg: #f9fafb;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+    --transition-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Adjust login-container */
+.login-container {
+    width: 100%;
+    max-width: 420px;
+    /* Increased top/bottom margin for better vertical placement appearance */
+    margin: 5rem auto; /* ADJUST '5rem' if needed, 'auto' handles horizontal centering */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0; /* Start hidden for animation */
+    padding-bottom: 2rem;
+    /* UPDATED Animation */
+    animation: slideInFade 0.8s var(--transition-ease) 0.2s forwards; /* Added delay */
+}
+
+/* UPDATED Entry Animation Keyframes */
+@keyframes slideInFade {
+    from {
+        opacity: 0;
+        transform: translateY(40px); /* Start slightly lower */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+h1 {
+    color: var(--text-primary);
+    text-align: center;
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+    width: 100%;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 350px;
+}
+
+form {
+    background-color: var(--card-bg);
+    padding: 2.25rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    transition: transform 0.4s var(--transition-bounce),
+                box-shadow 0.4s var(--transition-ease);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+form:hover {
+    transform: translateY(-6px) scale(1.01);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+    width: 100%;
+}
+
+.form-group:last-of-type {
+    margin-bottom: 2rem;
+}
+
+/* Apply transition to the label itself */
+label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.625rem;
+    transition: color 0.3s var(--transition-ease), transform 0.3s var(--transition-ease); /* Added transform transition */
+}
+
+input[type="email"]{
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    transition: all 0.3s var(--transition-ease);
+}
+input[type="password"] {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    transition: all 0.3s var(--transition-ease);
+}
+
+input[type="email"]:hover,
+input[type="password"]:hover {
+    border-color: #a0aec0;
+    background-color: #fff;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.15);
+    background-color: #fff;
+    transform: translateY(-1px) scale(1.01);
+}
+
+/* --- NEW: Animate label on input focus --- */
+/* Selects the label immediately preceding a focused input within the same form-group */
+input[type="email"]:focus + label,
+input[type="password"]:focus + label,
+/* Or, if label comes BEFORE input (more common): */
+label:has(+ input[type="email"]:focus),
+label:has(+ input[type="password"]:focus) {
+   color: var(--primary-color);
+   transform: translateY(-2px); /* Slightly lift the label */
+}
+
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+    color: #a0aec0;
+    font-size: 0.95rem;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.remember-me input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    transform: scale(1.1);
+    transition: transform 0.2s var(--transition-ease);
+}
+
+.remember-me input[type="checkbox"]:hover {
+    transform: scale(1.25);
+}
+
+.remember-me:hover input[type="checkbox"] {
+     transform: scale(1.25);
+}
+
+.forgot-password {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s var(--transition-ease), text-decoration 0.2s var(--transition-ease);
+}
+
+.forgot-password:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 0.875rem;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s var(--transition-bounce); /* Keep existing transition */
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 12px rgba(74, 108, 247, 0.25);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    box-shadow: 0 8px 20px rgba(74, 108, 247, 0.4);
+    transform: translateY(-3px) scale(1.03);
+    /* NEW: Add subtle brightness */
+    filter: brightness(1.1);
+}
+
+.btn-primary:active {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 3px 8px rgba(74, 108, 247, 0.2);
+    filter: brightness(0.95); /* Slightly darken on click */
+}
+
+/* Ripple effect (keep as is) */
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+}
+.btn-primary:focus:not(:active)::after { animation: ripple 0.6s ease-out; }
+@keyframes ripple {
+    0% { transform: scale(0, 0) translate(-50%, -50%); opacity: 0.5; }
+    100% { transform: scale(40, 40) translate(-50%, -50%); opacity: 0; }
+}
+
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 1.75rem 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    width: 100%;
+}
+.divider::before, .divider::after { content: ""; flex-grow: 1; height: 1px; background-color: var(--border-color); }
+.divider::before { margin-right: 1rem; }
+.divider::after { margin-left: 1rem; }
+
+
+.social-logins {
+    display: flex;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-bottom: 1.75rem;
+    width: 100%;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border-color);
+    background-color: #fff;
+    transition: all 0.3s var(--transition-ease); /* Keep existing transition */
+    cursor: pointer;
+}
+
+.social-btn:hover {
+    border-color: var(--primary-color);
+    background-color: #f5f8ff;
+    /* Combine transforms */
+    transform: translateY(-4px) scale(1.08) rotate(-5deg); /* ADDED rotate */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.social-btn svg {
+    transition: transform 0.3s var(--transition-ease);
+}
+
+.social-btn:hover svg {
+    transform: scale(1.15); /* Keep existing scale */
+}
+
+
+.signup-link {
+    text-align: center;
+    margin-top: 1.75rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    width: 100%;
+}
+.signup-link a {
+    color: var(--primary-color);
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.25rem;
+    transition: color 0.2s var(--transition-ease), text-decoration 0.2s var(--transition-ease);
+    display: inline-block;
+}
+.signup-link a:hover { color: var(--primary-hover); text-decoration: underline; }
+
+
+.error-message {
+    display: block;
+    color: var(--error-color);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+    animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    text-align: left;
+}
+@keyframes shake { /* Keep shake animation */
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
+    40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+
+/* --- Responsive adjustments specific to login form --- */
+@media (max-width: 520px) {
+    .login-container {
+         margin: 3rem auto; /* Adjust vertical margin for smaller screens */
+    }
+    form { padding: 1.5rem; border-radius: 12px; }
+    h1 { font-size: 1.625rem; }
+    .subtitle { font-size: 0.9rem; margin-bottom: 1.5rem; }
+    .social-logins { gap: 0.75rem; }
+    .social-btn { width: 40px; height: 40px; }
+    .remember-forgot { font-size: 0.8rem; }
+    .signup-link { font-size: 0.9rem; }
+}
+
+/* --- Accessibility focus rings (Keep as is) --- */
+*:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.2); }
+input[type="email"]:focus-visible, input[type="password"]:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(74, 108, 247, 0.15); }
+.btn-primary:focus-visible { outline: none; }

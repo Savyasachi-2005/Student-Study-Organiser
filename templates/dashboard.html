@@ -1,0 +1,342 @@
+{% extends 'layout.html' %}
+
+{% block title %}Dashboard - Study Resource Organizer{% endblock %}
+
+{% block styles %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dash_style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header bg-white shadow-sm py-4 mb-4">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="h3 mb-0">Welcome, {{ session['username'] }}!</h1>
+                    <p class="text-muted mb-0">Manage and track your learning resources</p>
+                </div>
+                <div class="col-md-6 text-md-end mt-3 mt-md-0">
+                    <a href="{{ url_for('add_resource') }}" class="btn btn-primary me-2">
+                        <i class="fas fa-plus-circle me-2"></i>Add Resource
+                    </a>
+                    <a href="{{ url_for('track_progress') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line me-2"></i>Track Progress
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Search and Filters -->
+        <div class="search-filter-section">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="resource-search" class="form-control" placeholder="Search resources...">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="d-flex gap-2">
+                        <select id="subject-filter" class="form-select">
+                            <option value="">All Subjects</option>
+                            {% for subject in subjects %}
+                                <option value="{{ subject }}">{{ subject }}</option>
+                            {% endfor %}
+                        </select>
+                        <select id="difficulty-filter" class="form-select">
+                            <option value="">All Difficulties</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                        <select id="status-filter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="completed">Completed</option>
+                            <option value="in-progress">In Progress</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Grid -->
+        <div class="resources-grid">
+            {% if resources %}
+                <div class="row g-4">
+                    {% for resource in resources %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card resource-card">
+                            <div class="card-header">
+                                <div class="d-flex align-items-center">
+                                    <div class="resource-icon-wrapper">
+                                        {% set icon_class = 'fa-link' %}
+                                        {% if resource.url and 'pdf' in resource.url|lower %}
+                                            {% set icon_class = 'fa-file-pdf' %}
+                                        {% elif resource.url and ('youtube.com' in resource.url or 'youtu.be' in resource.url) %}
+                                            {% set icon_class = 'fa-youtube fab' %}
+                                        {% elif resource.type and 'article' in resource.type|lower %}
+                                            {% set icon_class = 'fa-newspaper' %}
+                                        {% endif %}
+                                        <i class="fas {{ icon_class }}"></i>
+                                    </div>
+                                    <h3 class="card-title">{{ resource.title }}</h3>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p class="card-text">{{ resource.description | truncate(100) }}</p>
+                                
+                                <div class="resource-meta">
+                                    {% if resource.subject %}
+                                        <span class="badge bg-light text-dark">
+                                            <i class="fas fa-book"></i>{{ resource.subject }}
+                                        </span>
+                                    {% endif %}
+                                    {% if resource.difficulty %}
+                                        <span class="badge bg-{{ 'success' if resource.difficulty == 'Beginner' else 'warning' if resource.difficulty == 'Intermediate' else 'danger' }}">
+                                            <i class="fas fa-{{ 'star' if resource.difficulty == 'Beginner' else 'star-half-alt' if resource.difficulty == 'Intermediate' else 'star' }}"></i>
+                                            {{ resource.difficulty }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if resource.get_tags_list() %}
+                                <div class="resource-tags">
+                                    {% for tag in resource.get_tags_list() %}
+                                        <span class="tag">
+                                            <i class="fas fa-tag"></i>{{ tag }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <a href="{{ resource.url }}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-external-link-alt"></i>Open
+                                    </a>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('edit_resource', resource_id=resource.id) }}">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item mark-completed-btn" 
+                                                        data-resource-id="{{ resource.id }}"
+                                                        data-resource-title="{{ resource.title|escape }}">
+                                                    <i class="fas fa-check-circle me-2"></i>Mark Completed
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <button class="dropdown-item text-danger delete-btn"
+                                                        data-resource-id="{{ resource.id }}"
+                                                        data-resource-title="{{ resource.title|escape }}">
+                                                    <i class="fas fa-trash-alt me-2"></i>Delete
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-folder-open fa-4x"></i>
+                    </div>
+                    <h2 class="h4 mb-3">No resources found</h2>
+                    <p class="text-muted mb-4">Get started by adding your first study resource</p>
+                    <a href="{{ url_for('add_resource') }}" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i>Add Your First Resource
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('resource-search');
+    const subjectFilter = document.getElementById('subject-filter');
+    const difficultyFilter = document.getElementById('difficulty-filter');
+    const statusFilter = document.getElementById('status-filter');
+    const resourceCards = document.querySelectorAll('.resource-card');
+    const noResultsMessage = document.getElementById('no-results-message');
+
+    function filterResources() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedSubject = subjectFilter.value.toLowerCase();
+        const selectedDifficulty = difficultyFilter.value.toLowerCase();
+        const selectedStatus = statusFilter.value.toLowerCase();
+        
+        let visibleCount = 0;
+        
+        resourceCards.forEach(card => {
+            const title = card.querySelector('.card-title')?.textContent.toLowerCase() || '';
+            const description = card.querySelector('.card-text')?.textContent.toLowerCase() || '';
+            const subject = card.querySelector('.badge')?.textContent.toLowerCase() || '';
+            const difficulty = card.dataset.difficulty?.toLowerCase() || '';
+            const status = card.dataset.status?.toLowerCase() || '';
+            const tags = Array.from(card.querySelectorAll('.tag')).map(tag => tag.textContent.toLowerCase());
+
+            const matchesSearch = !searchTerm || 
+                title.includes(searchTerm) ||
+                description.includes(searchTerm) ||
+                subject.includes(searchTerm) ||
+                tags.some(tag => tag.includes(searchTerm));
+
+            const matchesSubject = !selectedSubject || subject === selectedSubject;
+            const matchesDifficulty = !selectedDifficulty || difficulty === selectedDifficulty;
+            const matchesStatus = !selectedStatus || status === selectedStatus;
+
+            const isVisible = matchesSearch && matchesSubject && matchesDifficulty && matchesStatus;
+            
+            const cardContainer = card.closest('.col-md-6');
+            if (cardContainer) {
+                cardContainer.style.display = isVisible ? '' : 'none';
+                if (isVisible) visibleCount++;
+            }
+        });
+
+        // Show/hide no results message
+        if (noResultsMessage) {
+            noResultsMessage.style.display = visibleCount === 0 ? 'block' : 'none';
+        }
+    }
+
+    // Add event listeners
+    searchInput.addEventListener('input', filterResources);
+    subjectFilter.addEventListener('change', filterResources);
+    difficultyFilter.addEventListener('change', filterResources);
+    statusFilter.addEventListener('change', filterResources);
+
+    // Mark Completed functionality
+    document.querySelectorAll('.mark-completed-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const resourceId = this.dataset.resourceId;
+            const resourceTitle = this.dataset.resourceTitle;
+            const cardElement = this.closest('.col-md-6');
+
+            if (confirm(`Mark "${resourceTitle}" as completed?`)) {
+                fetch(`/resource/${resourceId}/mark_completed`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        cardElement.style.opacity = '0';
+                        setTimeout(() => cardElement.remove(), 300);
+                        // Show toast notification instead of alert
+                        showToast('success', data.message || 'Resource marked as completed!');
+                    } else {
+                        showToast('danger', 'Error: ' + (data.message || 'Could not mark resource as completed.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('danger', 'An error occurred while marking the resource as completed.');
+                });
+            }
+        });
+    });
+
+    // Delete functionality
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const resourceId = this.dataset.resourceId;
+            const resourceTitle = this.dataset.resourceTitle;
+            const cardElement = this.closest('.col-md-6');
+
+            if (confirm(`Are you sure you want to delete "${resourceTitle}"?`)) {
+                fetch(`/resource/${resourceId}/delete`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        cardElement.style.opacity = '0';
+                        setTimeout(() => cardElement.remove(), 300);
+                        showToast('success', data.message || 'Resource deleted successfully!');
+                    } else {
+                        showToast('danger', 'Error: ' + (data.message || 'Could not delete resource.'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('danger', 'An error occurred while deleting the resource.');
+                });
+            }
+        });
+    });
+
+    // Scroll to search if coming from home page
+    if (localStorage.getItem("scrollToSearch") === "true") {
+        localStorage.removeItem("scrollToSearch");
+        const section = document.querySelector(".search-filter-section");
+        if (section) {
+            section.scrollIntoView({ behavior: "smooth" });
+            setTimeout(() => {
+                document.getElementById("resource-search").focus();
+            }, 500);
+        }
+    }
+
+    // Toast notification function
+    function showToast(type, message) {
+        const toastContainer = document.createElement('div');
+        toastContainer.className = 'position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '1050';
+        
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-white bg-${type} border-0`;
+        toast.setAttribute('role', 'alert');
+        toast.setAttribute('aria-live', 'assertive');
+        toast.setAttribute('aria-atomic', 'true');
+        
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                    ${message}
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        `;
+        
+        toastContainer.appendChild(toast);
+        document.body.appendChild(toastContainer);
+        
+        const bsToast = new bootstrap.Toast(toast);
+        bsToast.show();
+        
+        toast.addEventListener('hidden.bs.toast', () => {
+            toastContainer.remove();
+        });
+    }
+});
+</script>
+{% endblock %}
