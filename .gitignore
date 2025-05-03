@@ -48,4 +48,7 @@ Thumbs.db
 instance/
 .pytest_cache/
 .coverage
-htmlcov/ 
+htmlcov/
+
+# API Keys and Secrets
+api_key.py 
