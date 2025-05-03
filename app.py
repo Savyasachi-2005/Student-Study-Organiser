@@ -46,14 +46,22 @@ bcrypt.init_app(app)
 mail.init_app(app)
 
 db.init_app(app)
-migrate.init_app(app, db) # Initialize migration with app and db
+migrate.init_app(app, db)
 
-# Move db.create_all() inside app context
-with app.app_context():
-    try:
-        db.create_all() # Creates User and Resource tables if they don't exist
-    except Exception as e:
-        print(f"Error creating database tables: {e}")
+# Initialize database
+def init_db():
+    with app.app_context():
+        try:
+            print("Attempting to connect to database...")
+            print(f"Database URL: {app.config['SQLALCHEMY_DATABASE_URI']}")
+            db.create_all()
+            print("Database tables created successfully")
+        except Exception as e:
+            print(f"Error initializing database: {e}")
+            raise
+
+# Call init_db during application startup
+init_db()
 
 oauth = OAuth()
 oauth.init_app(app)
