@@ -21,6 +21,7 @@ app = Flask(__name__)
 
 # Configure app
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'ABHISHEKHIREMATH04242005')
+app.config['GOOGLE_ANALYTICS_ID'] = os.environ.get('GOOGLE_ANALYTICS_ID')
 
 # Database configuration
 database_url = os.environ.get('DATABASE_URL')
