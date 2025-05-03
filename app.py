@@ -39,6 +39,8 @@ mail.init_app(app)
 
 db.init_app(app)
 migrate.init_app(app, db) # Initialize migration with app and db
+
+# Move db.create_all() inside app context
 with app.app_context():
     db.create_all() # Creates User and Resource tables if they don't exist
 
