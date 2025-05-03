@@ -178,14 +178,6 @@ textarea.form-control {
                                 {% endfor %}
                             </div>
                             
-                            <div class="form-floating mb-3">
-                                {{ form.subject(class="form-control", id="subject", placeholder="Subject") }}
-                                {{ form.subject.label(for="subject") }}
-                                {% for error in form.subject.errors %}
-                                    <div class="invalid-feedback d-block">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                            
                             <div class="form-floating mb-4">
                                 {{ form.message(class="form-control", id="message", placeholder="Your Message") }}
                                 {{ form.message.label(for="message") }}

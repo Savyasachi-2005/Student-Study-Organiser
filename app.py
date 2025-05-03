@@ -587,7 +587,6 @@ def feedback():
             Type: {feedback_type_map.get(form.feedback_type.data, 'Other')}
             Name: {form.name.data}
             Email: {form.email.data}
-            Subject: {form.subject.data}
             Message: {form.message.data}
             
             Contact Information:

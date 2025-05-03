@@ -45,6 +45,5 @@ class FeedbackForm(FlaskForm):
         ],
         validators=[DataRequired()]
     )
-    subject = StringField('Subject', validators=[DataRequired(), Length(min=5, max=100)])
     message = TextAreaField('Message', validators=[DataRequired(), Length(min=10, max=1000)])
     submit = SubmitField('Send Feedback')
