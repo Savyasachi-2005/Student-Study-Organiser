@@ -21,7 +21,12 @@ app = Flask(__name__)
 
 # Configure app
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'ABHISHEKHIREMATH')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'postgresql://postgres:12345@localhost:5432/flask_auth_db')
+
+# Database configuration
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'postgresql://postgres:12345@localhost:5432/flask_auth_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Email configuration
@@ -42,7 +47,10 @@ migrate.init_app(app, db) # Initialize migration with app and db
 
 # Move db.create_all() inside app context
 with app.app_context():
-    db.create_all() # Creates User and Resource tables if they don't exist
+    try:
+        db.create_all() # Creates User and Resource tables if they don't exist
+    except Exception as e:
+        print(f"Error creating database tables: {e}")
 
 oauth = OAuth()
 oauth.init_app(app)
