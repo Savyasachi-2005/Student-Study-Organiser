@@ -187,7 +187,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-Project Link: [https://github.com/yourusername/study-resource-organizer](https://github.com/yourusername/study-resource-organizer)
+- **Project Repository**: [https://github.com/yourusername/study-resource-organizer](https://github.com/Savyasachi-2005/Student-Study-Organiser)
+- **Developer**: Abhishek Hiremath
+- **Email**: abhishekhiremath0424@gmail.com
+- **LinkedIn**: [Your LinkedIn Profile]([https://linkedin.com/in/yourprofile](https://www.linkedin.com/in/abhishek-hiremath-3020692a3/))
 
 ## 🙏 Acknowledgements
 
