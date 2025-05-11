@@ -4,6 +4,7 @@ from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate # Import Migrate
 import os # Import os module
+import warnings # Import the warnings module
 
 # 1. Create the Flask app instance
 app = Flask(__name__)
@@ -12,9 +13,34 @@ app = Flask(__name__)
 #    Replace with your actual database URI
 # Use the DATABASE_URL environment variable provided by Render
 # Provide a default SQLite URI for local development if DATABASE_URL is not set
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+database_url_env = os.environ.get('DATABASE_URL')
+# Removed the hardcoded default_fallback_db_uri with credentials
+
+if not database_url_env:
+    default_sqlite_uri = 'sqlite:///site.db' # Define a safe, local fallback
+    warnings.warn(
+        f"DATABASE_URL environment variable not set. "
+        f"Falling back to local SQLite database: '{default_sqlite_uri}'", # Updated warning message
+        UserWarning
+    )
+    app.config['SQLALCHEMY_DATABASE_URI'] = default_sqlite_uri # Fallback to SQLite
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url_env
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Optional: Suppress a warning
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key')
+
+secret_key_env = os.environ.get('SECRET_KEY')
+default_secret_key = 'your_default_secret_key' # Define default key for clarity
+
+if not secret_key_env:
+    warnings.warn(
+        "SECRET_KEY environment variable not set. "
+        "Falling back to a default SECRET_KEY. This is insecure for production!",
+        UserWarning
+    )
+    app.config['SECRET_KEY'] = default_secret_key
+else:
+    app.config['SECRET_KEY'] = secret_key_env
 
 # 3. Initialize SQLAlchemy AFTER app configuration
 db = SQLAlchemy()
@@ -51,7 +77,6 @@ class Resource(db.Model):
     progress = db.Column(db.String(50), nullable=False, default='Not Started')
     progress_percentage = db.Column(db.Integer, nullable=False, default=0)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
-    notes = db.Column(db.Text, nullable=True)
     urls = db.relationship('ResourceURL', backref='resource', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):

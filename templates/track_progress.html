@@ -641,12 +641,6 @@
                                             {{ resource.last_updated.strftime('%Y-%m-%d %H:%M') if resource.last_updated else 'Never' }}
                                         </small>
                                     </p>
-                                    {% if resource.notes %}
-                                    <p class="text-muted mt-2 mb-0 small">
-                                        <i class="fas fa-note-sticky me-1"></i>
-                                        {{ resource.notes }}
-                                    </p>
-                                    {% endif %}
                                 </div>
                             </div>
                         </div>

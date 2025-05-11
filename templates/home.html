@@ -46,7 +46,7 @@
             </div>
             
             <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 feature-card" onclick="goToDashboardAndScroll()">
+                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for('dashboard') }}'">
                     <div class="card-body text-center p-4">
                         <div class="feature-icon-wrapper mb-3">
                             <i class="fas fa-search fa-2x text-primary"></i>
@@ -100,13 +100,6 @@
         </div>
     </div>
 </div>
-
-<script>
-function goToDashboardAndScroll() {
-    localStorage.setItem("scrollToSearch", "true");
-    window.location.href = '{{url_for('dashboard')}}';
-}
-</script>
 
 <style>
 .hero-section {
