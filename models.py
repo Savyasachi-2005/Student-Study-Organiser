@@ -3,16 +3,18 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate # Import Migrate
-
+import os # Import os module
 
 # 1. Create the Flask app instance
 app = Flask(__name__)
 
 # 2. Configure the app (BEFORE initializing extensions that need config)
 #    Replace with your actual database URI
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' # Example configuration
-app.config['SECRET_KEY'] = 'your_secret_key' # Example configuration for session management, flash messages etc.
-
+# Use the DATABASE_URL environment variable provided by Render
+# Provide a default SQLite URI for local development if DATABASE_URL is not set
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///site.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Optional: Suppress a warning
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your_default_secret_key')
 
 # 3. Initialize SQLAlchemy AFTER app configuration
 db = SQLAlchemy()
