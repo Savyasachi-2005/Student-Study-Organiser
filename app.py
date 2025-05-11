@@ -154,26 +154,35 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user_id = session['user_id']
-    # Query resources belonging to the user, order by most recently added
-    user_resources = Resource.query.filter_by(user_id=user_id)\
-                                   .order_by(Resource.date_added.desc())\
-                                   .all()
+    try:
+        user_id = session.get('user_id')
+        if not user_id:
+            flash('Please log in to access this page.', 'warning')
+            return redirect(url_for('login'))
 
-    # Load URLs for each resource
-    for resource in user_resources:
-        resource.resource_urls = ResourceURL.query.filter_by(resource_id=resource.id).all()
+        # Query resources belonging to the user, order by most recently added
+        user_resources = Resource.query.filter_by(user_id=user_id)\
+                                     .order_by(Resource.date_added.desc())\
+                                     .all()
 
-    # Fetch distinct subjects for the filter dropdown for this user
-    subjects_query = db.session.query(Resource.subject)\
-                               .filter(Resource.user_id == user_id)\
-                               .distinct()\
-                               .order_by(Resource.subject)\
-                               .all()
-    # Extract subject strings, handling potential None values
-    subjects = [s[0] for s in subjects_query if s[0]]
+        # Load URLs for each resource
+        for resource in user_resources:
+            resource.resource_urls = ResourceURL.query.filter_by(resource_id=resource.id).all()
 
-    return render_template('dashboard.html', resources=user_resources, subjects=subjects)
+        # Fetch distinct subjects for the filter dropdown for this user
+        subjects_query = db.session.query(Resource.subject)\
+                                 .filter(Resource.user_id == user_id)\
+                                 .distinct()\
+                                 .order_by(Resource.subject)\
+                                 .all()
+        # Extract subject strings, handling potential None values
+        subjects = [s[0] for s in subjects_query if s[0]]
+
+        return render_template('dashboard.html', resources=user_resources, subjects=subjects)
+    except Exception as e:
+        print(f"Dashboard error: {str(e)}")  # Log the error
+        flash('An error occurred while loading the dashboard. Please try again.', 'danger')
+        return redirect(url_for('home'))
 # --- END UPDATED DASHBOARD ROUTE ---
 
 @app.route('/logout',methods=['GET','POST'])
@@ -534,14 +543,27 @@ def authorize_google():
         if not user:
             # Create new user
             username = email.split('@')[0]
+            # Ensure username is unique
+            base_username = username
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}{counter}"
+                counter += 1
+
             user = User(
                 username=username,
                 email=email,
                 password=''  # No password needed for OAuth users
             )
             db.session.add(user)
-            db.session.commit()
-            flash('Account created successfully!', 'success')
+            try:
+                db.session.commit()
+                flash('Account created successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                print(f"Error creating user: {str(e)}")
+                flash('Error creating account. Please try again.', 'danger')
+                return redirect(url_for('login'))
         
         # Log the user in
         session['user_id'] = user.id
