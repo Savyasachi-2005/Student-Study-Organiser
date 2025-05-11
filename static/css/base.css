@@ -421,3 +421,10 @@ footer a:hover {
     background-color: var(--success-color);
     color: white;
 }
+
+/* Add placeholder styling for subject input */
+input::placeholder {
+    color: #b0b0b0;
+    font-style: italic;
+    opacity: 1; /* Ensure placeholder is visible */
+}
