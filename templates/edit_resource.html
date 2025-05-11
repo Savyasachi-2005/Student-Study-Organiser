@@ -4,13 +4,215 @@
 
 {% block styles %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_rec.css') }}">
+    <style>
+        .edit-resource-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #4facfe;
+            box-shadow: 0 0 0 0.2rem rgba(79, 172, 254, 0.25);
+        }
+
+        .url-input-group {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .url-input-group .form-control {
+            padding-right: 3rem;
+        }
+
+        .url-actions {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .url-actions button {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            border-radius: 4px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+            transition: all 0.2s ease;
+        }
+
+        .url-actions button:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .url-actions .primary-toggle {
+            background: #4facfe;
+            color: white;
+            border: none;
+        }
+
+        .url-actions .primary-toggle:hover {
+            background: #2196f3;
+        }
+
+        .add-url-btn {
+            width: 100%;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .add-url-btn:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+            color: #495057;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .form-actions .btn {
+            flex: 1;
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2196f3 0%, #00e1fe 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .edit-resource-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .form-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .form-header p {
+                font-size: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .edit-resource-container {
+                margin: 0.5rem;
+                padding: 1rem;
+            }
+
+            .url-actions {
+                position: static;
+                transform: none;
+                margin-top: 0.5rem;
+                justify-content: flex-end;
+            }
+
+            .url-input-group .form-control {
+                padding-right: 1rem;
+            }
+        }
+
+        /* Animation */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Study Resource</h2>
-    <hr>
+<div class="edit-resource-container fade-in">
+    <div class="form-header">
+        <h2>Edit Resource</h2>
+        <p>Update your resource details and URLs</p>
+    </div>
 
     {# Display flashed messages if any #}
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -25,63 +227,98 @@
     {% endwith %}
 
     <form method="POST" action="{{ url_for('edit_resource', resource_id=resource.id) }}">
-        <div class="mb-3">
+        <div class="form-group">
             <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="title" name="title" value="{{ resource.title }}" required>
         </div>
 
-        <div class="mb-3">
+        <div class="form-group">
             <label for="description" class="form-label">Description</label>
             <textarea class="form-control" id="description" name="description" rows="3">{{ resource.description }}</textarea>
         </div>
 
-        <div class="mb-3">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" value="{{ resource.subject }}">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="difficulty" class="form-label">Difficulty</label>
+                    <select class="form-control" id="difficulty" name="difficulty">
+                        <option value="">Select Difficulty</option>
+                        <option value="Beginner" {% if resource.difficulty == 'Beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="Intermediate" {% if resource.difficulty == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="Advanced" {% if resource.difficulty == 'Advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" class="form-control" id="tags" name="tags" value="{{ resource.tags }}" placeholder="Enter tags separated by commas">
+            <small class="form-text text-muted">Separate tags with commas (e.g., math, algebra, calculus)</small>
+        </div>
+
+        <div class="form-group">
             <label class="form-label">URLs <span class="text-danger">*</span></label>
             <div id="urls-container">
-                {% for url in resource.urls %}
-                <div class="url-entry mb-2">
-                    <div class="input-group">
-                        <input type="url" class="form-control" name="urls[]" value="{{ url.url }}" required>
-                        <div class="input-group-text">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="primary_url" value="{{ loop.index0 }}" {% if url.is_primary %}checked{% endif %}>
-                                <label class="form-check-label">Primary</label>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-outline-danger remove-url" {% if resource.urls|length == 1 %}disabled{% endif %}>
+                {% for url in resource.resource_urls %}
+                <div class="url-input-group">
+                    <input type="url" class="form-control" name="urls[]" value="{{ url.url }}" required>
+                    <div class="url-actions">
+                        <button type="button" class="primary-toggle {% if url.is_primary %}active{% endif %}" 
+                                onclick="setPrimaryUrl(this, {{ loop.index0 }})">
+                            Primary
+                        </button>
+                        <button type="button" class="remove-url" onclick="removeUrl(this)">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
+                {# URL Type Icon #}
+                {% set icon_class = 'fa-solid' %}
+                {% set icon_name = 'link' %}
+                {% if url.type == 'PDF' %}
+                    {% set icon_name = 'file-pdf' %}
+                {% elif url.type == 'YouTube' %}
+                    {% set icon_class = 'fa-brands' %}
+                    {% set icon_name = 'youtube' %}
+                {% elif url.type == 'Article' %}
+                    {% set icon_name = 'newspaper' %}
+                {% elif url.type == 'GitHub' %}
+                    {% set icon_class = 'fa-brands' %}
+                    {% set icon_name = 'github' %}
+                {% elif url.type == 'Medium' %}
+                    {% set icon_class = 'fa-brands' %}
+                    {% set icon_name = 'medium' %}
+                {% elif url.type == 'Udemy' %}
+                    {% set icon_class = 'fa-brands' %}
+                    {% set icon_name = 'udemy' %}
+                {% elif url.type == 'Coursera' %}
+                    {% set icon_class = 'fa-brands' %}
+                    {% set icon_name = 'coursera' %}
+                {% endif %}
+                <i class="{{ icon_class }} fa-{{ icon_name }}"></i>
                 {% endfor %}
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-url">
+            <button type="button" class="add-url-btn" onclick="addUrlField()">
                 <i class="fas fa-plus"></i> Add Another URL
             </button>
+            <input type="hidden" name="primary_url" id="primary_url" value="0">
         </div>
 
-        <div class="mb-3">
-            <label for="subject" class="form-label">Subject</label>
-            <input type="text" class="form-control" id="subject" name="subject" value="{{ resource.subject }}">
+        <div class="form-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
         </div>
-
-        <div class="mb-3">
-            <label for="difficulty" class="form-label">Difficulty</label>
-            <select class="form-select" id="difficulty" name="difficulty">
-                <option value="">Choose...</option>
-                <option value="beginner" {% if resource.difficulty == 'beginner' %}selected{% endif %}>Beginner</option>
-                <option value="intermediate" {% if resource.difficulty == 'intermediate' %}selected{% endif %}>Intermediate</option>
-                <option value="advanced" {% if resource.difficulty == 'advanced' %}selected{% endif %}>Advanced</option>
-            </select>
-        </div>
-
-        <div class="mb-3">
-            <label for="tags" class="form-label">Tags (comma-separated)</label>
-            <input type="text" class="form-control" id="tags" name="tags" value="{{ resource.tags }}" placeholder="e.g., python, webdev, tutorial">
-        </div>
-
-        <button type="submit" class="btn btn-primary">Update Resource</button>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 {% endblock %}
@@ -89,52 +326,75 @@
 {% block scripts %}
 {{ super() }}
 <script>
+function addUrlField() {
+    const container = document.getElementById('urls-container');
+    const urlCount = container.children.length;
+    
+    const urlGroup = document.createElement('div');
+    urlGroup.className = 'url-input-group';
+    urlGroup.innerHTML = `
+        <input type="url" class="form-control" name="urls[]" required>
+        <div class="url-actions">
+            <button type="button" class="primary-toggle" onclick="setPrimaryUrl(this, ${urlCount})">
+                Primary
+            </button>
+            <button type="button" class="remove-url" onclick="removeUrl(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+    
+    container.appendChild(urlGroup);
+}
+
+function removeUrl(button) {
+    const urlGroup = button.closest('.url-input-group');
+    const container = document.getElementById('urls-container');
+    
+    if (container.children.length > 1) {
+        urlGroup.remove();
+        updatePrimaryUrlIndices();
+    } else {
+        alert('At least one URL is required');
+    }
+}
+
+function setPrimaryUrl(button, index) {
+    const primaryUrlInput = document.getElementById('primary_url');
+    const allPrimaryButtons = document.querySelectorAll('.primary-toggle');
+    
+    allPrimaryButtons.forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.background = '#f8f9fa';
+        btn.style.color = '#6c757d';
+    });
+    
+    button.classList.add('active');
+    button.style.background = '#4facfe';
+    button.style.color = 'white';
+    primaryUrlInput.value = index;
+}
+
+function updatePrimaryUrlIndices() {
+    const primaryUrlInput = document.getElementById('primary_url');
+    const currentPrimaryIndex = parseInt(primaryUrlInput.value);
+    const urlGroups = document.querySelectorAll('.url-input-group');
+    
+    if (currentPrimaryIndex >= urlGroups.length) {
+        primaryUrlInput.value = urlGroups.length - 1;
+        const newPrimaryButton = urlGroups[urlGroups.length - 1].querySelector('.primary-toggle');
+        setPrimaryUrl(newPrimaryButton, urlGroups.length - 1);
+    }
+}
+
+// Initialize primary URL button states
 document.addEventListener('DOMContentLoaded', function() {
-    const urlsContainer = document.getElementById('urls-container');
-    const addUrlButton = document.getElementById('add-url');
-    let urlCount = {{ resource.urls|length }};
-
-    function updateRemoveButtons() {
-        const removeButtons = document.querySelectorAll('.remove-url');
-        removeButtons.forEach(button => {
-            button.disabled = removeButtons.length === 1;
-        });
+    const primaryUrlInput = document.getElementById('primary_url');
+    const primaryIndex = parseInt(primaryUrlInput.value);
+    const primaryButton = document.querySelectorAll('.primary-toggle')[primaryIndex];
+    if (primaryButton) {
+        setPrimaryUrl(primaryButton, primaryIndex);
     }
-
-    function createUrlEntry() {
-        const urlEntry = document.createElement('div');
-        urlEntry.className = 'url-entry mb-2';
-        urlEntry.innerHTML = `
-            <div class="input-group">
-                <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>
-                <div class="input-group-text">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="primary_url" value="${urlCount}">
-                        <label class="form-check-label">Primary</label>
-                    </div>
-                </div>
-                <button type="button" class="btn btn-outline-danger remove-url">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-        `;
-        return urlEntry;
-    }
-
-    addUrlButton.addEventListener('click', function() {
-        const urlEntry = createUrlEntry();
-        urlsContainer.appendChild(urlEntry);
-        urlCount++;
-        updateRemoveButtons();
-    });
-
-    urlsContainer.addEventListener('click', function(e) {
-        if (e.target.closest('.remove-url')) {
-            const urlEntry = e.target.closest('.url-entry');
-            urlEntry.remove();
-            updateRemoveButtons();
-        }
-    });
 });
 </script>
 {% endblock %} 

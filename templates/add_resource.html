@@ -4,87 +4,186 @@
 
 {% block styles %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/add_rec.css') }}">
+    <style>
+        .resource-form {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .form-header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .url-entry {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+
+        .url-entry .input-group {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .url-entry .form-control {
+            border-right: none;
+        }
+
+        .url-entry .input-group-text {
+            background: white;
+            border-left: none;
+        }
+
+        .url-entry .form-check {
+            margin: 0;
+            padding: 0.5rem 1rem;
+        }
+
+        .url-entry .remove-url {
+            border-left: none;
+        }
+
+        .url-entry .remove-url:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .add-url-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px dashed #dee2e6;
+            background: #f8f9fa;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .add-url-btn:hover {
+            background: #e9ecef;
+            border-color: #ced4da;
+            color: #495057;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .form-actions {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .form-actions .btn {
+            min-width: 120px;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Add New Study Resource</h2>
-    <hr>
+    <div class="resource-form">
+        <div class="form-header">
+            <h2>Add New Study Resource</h2>
+            <p class="text-muted">Fill in the details below to add a new resource to your collection</p>
+        </div>
 
-    {# Display flashed messages if any (e.g., validation errors from POST) #}
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('add_resource') }}">
+            <div class="mb-4">
+                <label for="title" class="form-label required-field">Title</label>
+                <input type="text" class="form-control" id="title" name="title" required>
             </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
 
-    {# The action attribute can be url_for('add_resource') or empty to post to the same URL #}
-    <form method="POST" action="{{ url_for('add_resource') }}">
-        {# CSRF Token - Important if using WTForms or Flask-WTF #}
-        {# {{ form.hidden_tag() }} #}
+            <div class="mb-4">
+                <label for="description" class="form-label">Description</label>
+                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter a brief description of the resource..."></textarea>
+            </div>
 
-        <div class="mb-3">
-            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="title" name="title" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">URLs <span class="text-danger">*</span></label>
-            <div id="urls-container">
-                <div class="url-entry mb-2">
-                    <div class="input-group">
-                        <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>
-                        <div class="input-group-text">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="primary_url" value="0" checked>
-                                <label class="form-check-label">Primary</label>
+            <div class="mb-4">
+                <label class="form-label required-field">Resource URLs</label>
+                <div id="urls-container">
+                    <div class="url-entry">
+                        <div class="input-group">
+                            <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>
+                            <div class="input-group-text">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="primary_url" value="0" checked>
+                                    <label class="form-check-label">Primary</label>
+                                </div>
                             </div>
+                            <button type="button" class="btn btn-outline-danger remove-url" disabled>
+                                <i class="fas fa-times"></i>
+                            </button>
                         </div>
-                        <button type="button" class="btn btn-outline-danger remove-url" disabled>
-                            <i class="fas fa-times"></i>
-                        </button>
                     </div>
                 </div>
+                <button type="button" class="btn add-url-btn" id="add-url">
+                    <i class="fas fa-plus me-2"></i>Add Another URL
+                </button>
+                <small class="form-text text-muted mt-2">At least one URL is required. Mark one URL as primary.</small>
             </div>
-            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-url">
-                <i class="fas fa-plus"></i> Add Another URL
-            </button>
-        </div>
 
-        <div class="mb-3">
-            <label for="subject" class="form-label">Subject</label>
-            <input type="text" class="form-control" id="subject" name="subject">
-        </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <label for="subject" class="form-label">Subject</label>
+                    <input type="text" class="form-control" id="subject" name="subject" placeholder="e.g., Mathematics, Physics">
+                </div>
 
-        <div class="mb-3">
-            <label for="difficulty" class="form-label">Difficulty</label>
-            <select class="form-select" id="difficulty" name="difficulty">
-                <option selected value="">Choose...</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-            </select>
-        </div>
+                <div class="col-md-6 mb-4">
+                    <label for="difficulty" class="form-label">Difficulty Level</label>
+                    <select class="form-select" id="difficulty" name="difficulty">
+                        <option selected value="">Choose difficulty...</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                    </select>
+                </div>
+            </div>
 
-         <div class="mb-3">
-            <label for="tags" class="form-label">Tags (comma-separated)</label>
-            <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g., python, webdev, tutorial">
-        </div>
+            <div class="mb-4">
+                <label for="tags" class="form-label">Tags</label>
+                <input type="text" class="form-control" id="tags" name="tags" placeholder="e.g., python, webdev, tutorial (comma-separated)">
+                <small class="form-text text-muted">Add tags to help organize and find your resources easily</small>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Add Resource</button>
-        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
-    </form>
+            <div class="form-actions">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-2"></i>Add Resource
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}
 
@@ -105,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createUrlEntry() {
         const urlEntry = document.createElement('div');
-        urlEntry.className = 'url-entry mb-2';
+        urlEntry.className = 'url-entry';
         urlEntry.innerHTML = `
             <div class="input-group">
                 <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>

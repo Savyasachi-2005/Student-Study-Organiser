@@ -43,6 +43,7 @@ class Resource(db.Model):
     progress = db.Column(db.String(50), nullable=False, default='Not Started')
     progress_percentage = db.Column(db.Integer, nullable=False, default=0)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    notes = db.Column(db.Text, nullable=True)
     urls = db.relationship('ResourceURL', backref='resource', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):

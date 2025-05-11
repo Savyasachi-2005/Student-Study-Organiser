@@ -1,27 +1,20 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="hero-section text-center py-5 fade-in">
+<div class="hero-section">
     <div class="container">
-        <h1 class="display-4 fw-bold mb-4">Study Resource Organizer</h1>
-        <p class="lead text-muted mb-5">Organize, track, and optimize your learning journey in one place</p>
-        
-        {% if not session.log_in %}
-        <div class="cta-buttons mb-5">
-            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg me-3">
-                <i class="fas fa-sign-in-alt me-2"></i>Get Started
-            </a>
-            <a href="{{ url_for('register') }}" class="btn btn-outline-primary btn-lg">
-                <i class="fas fa-user-plus me-2"></i>Create Account
-            </a>
+        <div class="hero-content">
+            <h1 class="hero-title">Study Resource Organizer</h1>
+            <p class="hero-subtitle">Organize, track, and optimize your learning journey with our comprehensive resource management platform</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('add_resource') }}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Resource
+                </a>
+                <a href="{{ url_for('track_progress') }}" class="btn btn-outline-light">
+                    <i class="fas fa-chart-line me-2"></i>Track Progress
+                </a>
+            </div>
         </div>
-        {% else %}
-        <div class="cta-buttons mb-5">
-            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
-            </a>
-        </div>
-        {% endif %}
     </div>
 </div>
 
@@ -117,11 +110,108 @@ function goToDashboardAndScroll() {
 
 <style>
 .hero-section {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #2C5282 100%);
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    padding: 4rem 0;
+    margin-bottom: 2rem;
     color: white;
-    padding: 5rem 0;
-    margin-top: -3rem;
-    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/></svg>') repeat;
+    opacity: 0.4;
+    animation: float 20s linear infinite;
+}
+
+@keyframes float {
+    from { transform: translateY(0) rotate(0deg); }
+    to { transform: translateY(-100px) rotate(360deg); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    background: linear-gradient(to right, #ffffff, #e0e0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s infinite;
+    background-size: 200% auto;
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+    100% { background-position: 0% center; }
+}
+
+.hero-subtitle {
+    font-size: 1.4rem;
+    opacity: 0.9;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    color: #ffffff;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-buttons {
+    margin-top: 2rem;
+    animation: fadeInUp 1s ease-out 0.5s both;
+}
+
+.hero-buttons .btn {
+    margin: 0.5rem;
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    transition: all 0.3s ease;
+}
+
+.hero-buttons .btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.hero-buttons .btn-primary {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    border: none;
+}
+
+.hero-buttons .btn-outline-light {
+    border: 2px solid rgba(255,255,255,0.8);
+}
+
+.hero-buttons .btn-outline-light:hover {
+    background: rgba(255,255,255,0.1);
 }
 
 .feature-icon-wrapper {

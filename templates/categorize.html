@@ -139,7 +139,7 @@
                     {% endif %}
                 </div>
                 <div class="resource-actions">
-                    <a href="{{ resource.url }}" target="_blank" class="btn btn-sm btn-outline-primary">Visit</a>
+                    <a href="{{ resource.resource_urls[0].url if resource.resource_urls else '#' }}" target="_blank" class="btn btn-sm btn-outline-primary">Visit</a>
                     <a href="{{ url_for('edit_resource', resource_id=resource.id) }}" class="btn btn-sm btn-outline-secondary">Edit</a>
                     {# Add other actions if needed #}
                 </div>

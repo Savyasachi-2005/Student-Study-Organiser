@@ -76,15 +76,30 @@
                             <div class="card-header">
                                 <div class="d-flex align-items-center">
                                     <div class="resource-icon-wrapper">
-                                        {% set icon_class = 'fa-link' %}
-                                        {% if resource.url and 'pdf' in resource.url|lower %}
-                                            {% set icon_class = 'fa-file-pdf' %}
-                                        {% elif resource.url and ('youtube.com' in resource.url or 'youtu.be' in resource.url) %}
-                                            {% set icon_class = 'fa-youtube fab' %}
-                                        {% elif resource.type and 'article' in resource.type|lower %}
-                                            {% set icon_class = 'fa-newspaper' %}
+                                        {# Resource Type Icon #}
+                                        {% set icon_class = 'fa-solid' %}
+                                        {% set icon_name = 'book' %}
+                                        {% if resource.type == 'PDF' %}
+                                            {% set icon_name = 'file-pdf' %}
+                                        {% elif resource.type == 'YouTube' %}
+                                            {% set icon_class = 'fa-brands' %}
+                                            {% set icon_name = 'youtube' %}
+                                        {% elif resource.type == 'Article' %}
+                                            {% set icon_name = 'newspaper' %}
+                                        {% elif resource.type == 'GitHub' %}
+                                            {% set icon_class = 'fa-brands' %}
+                                            {% set icon_name = 'github' %}
+                                        {% elif resource.type == 'Medium' %}
+                                            {% set icon_class = 'fa-brands' %}
+                                            {% set icon_name = 'medium' %}
+                                        {% elif resource.type == 'Udemy' %}
+                                            {% set icon_class = 'fa-brands' %}
+                                            {% set icon_name = 'udemy' %}
+                                        {% elif resource.type == 'Coursera' %}
+                                            {% set icon_class = 'fa-brands' %}
+                                            {% set icon_name = 'coursera' %}
                                         {% endif %}
-                                        <i class="fas {{ icon_class }}"></i>
+                                        <i class="{{ icon_class }} fa-{{ icon_name }}"></i>
                                     </div>
                                     <h3 class="card-title">{{ resource.title }}</h3>
                                 </div>
@@ -119,20 +134,28 @@
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div class="dropdown">
-                                        <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                            <i class="fas fa-external-link-alt"></i>Open
+                                        <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-external-link-alt"></i> Open
                                         </button>
                                         <ul class="dropdown-menu">
-                                            {% for url in resource.urls %}
-                                            <li>
-                                                <a class="dropdown-item" href="{{ url.url }}" target="_blank">
-                                                    {% if url.is_primary %}
-                                                    <i class="fas fa-star text-warning"></i>
-                                                    {% endif %}
-                                                    {{ url.url|truncate(30) }}
-                                                </a>
-                                            </li>
-                                            {% endfor %}
+                                            {% if resource.resource_urls %}
+                                                {% for url in resource.resource_urls %}
+                                                    <li>
+                                                        <a class="dropdown-item" href="{{ url.url }}" target="_blank">
+                                                            {% if url.is_primary %}
+                                                                <i class="fas fa-star text-warning"></i>
+                                                            {% endif %}
+                                                            {{ url.url|truncate(50) }}
+                                                        </a>
+                                                    </li>
+                                                {% endfor %}
+                                            {% else %}
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ url_for('edit_resource', resource_id=resource.id) }}">
+                                                        <i class="fas fa-plus-circle"></i> Add URL
+                                                    </a>
+                                                </li>
+                                            {% endif %}
                                         </ul>
                                     </div>
                                     <div class="dropdown">

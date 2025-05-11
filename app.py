@@ -160,6 +160,10 @@ def dashboard():
                                    .order_by(Resource.date_added.desc())\
                                    .all()
 
+    # Load URLs for each resource
+    for resource in user_resources:
+        resource.resource_urls = ResourceURL.query.filter_by(resource_id=resource.id).all()
+
     # Fetch distinct subjects for the filter dropdown for this user
     subjects_query = db.session.query(Resource.subject)\
                                .filter(Resource.user_id == user_id)\
@@ -169,8 +173,6 @@ def dashboard():
     # Extract subject strings, handling potential None values
     subjects = [s[0] for s in subjects_query if s[0]]
 
-    # Pass the resources and subjects to the template
-    # The template uses session['username'], so no need to pass it separately
     return render_template('dashboard.html', resources=user_resources, subjects=subjects)
 # --- END UPDATED DASHBOARD ROUTE ---
 
@@ -311,12 +313,13 @@ def edit_resource(resource_id):
 
             # Add new URLs
             for i, url in enumerate(urls):
-                resource_url = ResourceURL(
-                    url=url,
-                    is_primary=(i == primary_url_index),
-                    resource_id=resource.id
-                )
-                db.session.add(resource_url)
+                if url.strip():  # Only add non-empty URLs
+                    resource_url = ResourceURL(
+                        url=url.strip(),
+                        is_primary=(i == primary_url_index),
+                        resource_id=resource.id
+                    )
+                    db.session.add(resource_url)
 
             db.session.commit()
             flash('Resource updated successfully!', 'success')
@@ -326,7 +329,18 @@ def edit_resource(resource_id):
             flash(f'Error updating resource: {str(e)}', 'danger')
             return render_template('edit_resource.html', resource=resource)
 
-    return render_template('edit_resource.html', resource=resource)
+    # For GET request, prepare the resource data
+    resource_data = {
+        'id': resource.id,
+        'title': resource.title,
+        'description': resource.description,
+        'subject': resource.subject,
+        'difficulty': resource.difficulty,
+        'tags': resource.tags,
+        'resource_urls': ResourceURL.query.filter_by(resource_id=resource.id).all()
+    }
+    
+    return render_template('edit_resource.html', resource=resource_data)
 
 @app.route('/resource/<int:resource_id>/mark_completed', methods=['POST'])
 @login_required
@@ -380,38 +394,68 @@ def delete_resource(resource_id):
 @app.route('/track_progress')
 @login_required
 def track_progress():
-    user_id = session['user_id']
+    resources = Resource.query.filter_by(user_id=session['user_id']).all()
     
-    # Get all resources for the user
-    resources = Resource.query.filter_by(user_id=user_id).all()
+    # Calculate statistics
+    total_resources = len(resources)
+    completed_resources = sum(1 for r in resources if r.progress == 'completed')
+    in_progress_resources = sum(1 for r in resources if r.progress == 'in-progress')
     
-    # Format resources for JavaScript
-    resources_data = []
+    # Prepare data for charts
+    progress_data = []
+    
     for resource in resources:
-        resources_data.append({
+        # Get all URLs for this resource
+        urls = ResourceURL.query.filter_by(resource_id=resource.id).all()
+        primary_url = next((url.url for url in urls if url.is_primary), urls[0].url if urls else None)
+        
+        # Determine icon based on URL type
+        icon = 'book'  # default icon
+        if primary_url:
+            if 'youtube.com' in primary_url or 'youtu.be' in primary_url:
+                icon = 'youtube'
+            elif 'pdf' in primary_url.lower():
+                icon = 'file-pdf'
+            elif 'github.com' in primary_url:
+                icon = 'github'
+            elif 'medium.com' in primary_url:
+                icon = 'medium'
+            elif 'udemy.com' in primary_url:
+                icon = 'graduation-cap'
+            elif 'coursera.org' in primary_url:
+                icon = 'university'
+        
+        # Add to progress data
+        progress_data.append({
             'id': resource.id,
             'title': resource.title,
-            'description': resource.description,
+            'url': primary_url,
+            'progress': resource.progress or 'Not Started',
+            'progress_percentage': resource.progress_percentage or 0,
+            'last_updated': resource.last_updated,
             'subject': resource.subject or 'Uncategorized',
-            'type': resource.type or 'Link',
-            'status': 'Completed' if resource.progress_percentage == 100 else 'In Progress' if resource.progress_percentage > 0 else 'Not Started',
-            'progress': resource.progress_percentage,
-            'last_studied': resource.last_updated.strftime("%Y-%m-%d") if resource.last_updated else "Never",
-            'url': resource.url,
-            'icon': 'book',  # Default icon, you can customize based on type
-            'notes': resource.notes if hasattr(resource, 'notes') else ''  # Add notes if they exist
+            'type': resource.type or 'General',
+            'icon': icon,
+            'notes': resource.notes if hasattr(resource, 'notes') else ''
         })
     
+    # Sort progress_data by last_updated, handling None values
+    progress_data.sort(key=lambda x: x['last_updated'] if x['last_updated'] is not None else datetime.min, reverse=True)
+    
     return render_template('track_progress.html',
-                         resources=resources_data)
+                         resources=resources,
+                         progress_data=progress_data,
+                         total_resources=total_resources,
+                         completed_resources=completed_resources,
+                         in_progress_resources=in_progress_resources)
 
 @app.route('/update_progress', methods=['POST'])
 @login_required
 def update_progress():
     data = request.get_json()
     resource_id = data.get('resource_id')
-    progress = int(data.get('progress', 0))
     status = data.get('status')
+    progress_percentage = int(data.get('progress_percentage', 0))
     notes = data.get('notes', '')
     
     resource = Resource.query.get_or_404(resource_id)
@@ -421,16 +465,9 @@ def update_progress():
         return jsonify({'success': False, 'message': 'Unauthorized'}), 403
     
     try:
-        # Update progress percentage
-        resource.progress_percentage = progress
-        
-        # Update status based on progress
-        if progress == 100:
-            resource.progress = 'Completed'
-        elif progress > 0:
-            resource.progress = 'In Progress'
-        else:
-            resource.progress = 'Not Started'
+        # Update status and progress percentage
+        resource.progress = status
+        resource.progress_percentage = progress_percentage
         
         # Update notes if provided
         if hasattr(resource, 'notes'):
@@ -440,7 +477,15 @@ def update_progress():
         resource.last_updated = datetime.utcnow()
         
         db.session.commit()
-        return jsonify({'success': True, 'message': 'Progress updated successfully'})
+        
+        # Return updated resource data
+        return jsonify({
+            'success': True,
+            'message': 'Progress updated successfully',
+            'status': resource.progress,
+            'progress_percentage': resource.progress_percentage,
+            'notes': resource.notes if hasattr(resource, 'notes') else ''
+        })
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'message': str(e)}), 500
