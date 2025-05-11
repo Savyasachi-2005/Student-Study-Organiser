@@ -2,21 +2,27 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_bcrypt import Bcrypt
+from flask_migrate import Migrate # Import Migrate
 
 
 # 1. Create the Flask app instance
-
+app = Flask(__name__)
 
 # 2. Configure the app (BEFORE initializing extensions that need config)
 #    Replace with your actual database URI
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db' # Example configuration
+app.config['SECRET_KEY'] = 'your_secret_key' # Example configuration for session management, flash messages etc.
 
 
 # 3. Initialize SQLAlchemy AFTER app configuration
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
+db.init_app(app)
+bcrypt.init_app(app)
+
 # 4. Initialize Migrate AFTER app and db are created
- # Corrected typo
+migrate = Migrate(app, db) # Initialize Migrate
 
 # --- Define your models AFTER db is initialized ---
 class User(db.Model):
