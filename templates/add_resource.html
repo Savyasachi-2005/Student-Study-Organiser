@@ -40,8 +40,26 @@
         </div>
 
         <div class="mb-3">
-            <label for="url" class="form-label">URL <span class="text-danger">*</span></label>
-            <input type="url" class="form-control" id="url" name="url" placeholder="https://example.com" required>
+            <label class="form-label">URLs <span class="text-danger">*</span></label>
+            <div id="urls-container">
+                <div class="url-entry mb-2">
+                    <div class="input-group">
+                        <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>
+                        <div class="input-group-text">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="primary_url" value="0" checked>
+                                <label class="form-check-label">Primary</label>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-danger remove-url" disabled>
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-url">
+                <i class="fas fa-plus"></i> Add Another URL
+            </button>
         </div>
 
         <div class="mb-3">
@@ -68,4 +86,57 @@
         <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlsContainer = document.getElementById('urls-container');
+    const addUrlButton = document.getElementById('add-url');
+    let urlCount = 1;
+
+    function updateRemoveButtons() {
+        const removeButtons = document.querySelectorAll('.remove-url');
+        removeButtons.forEach(button => {
+            button.disabled = removeButtons.length === 1;
+        });
+    }
+
+    function createUrlEntry() {
+        const urlEntry = document.createElement('div');
+        urlEntry.className = 'url-entry mb-2';
+        urlEntry.innerHTML = `
+            <div class="input-group">
+                <input type="url" class="form-control" name="urls[]" placeholder="https://example.com" required>
+                <div class="input-group-text">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="primary_url" value="${urlCount}">
+                        <label class="form-check-label">Primary</label>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-danger remove-url">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        return urlEntry;
+    }
+
+    addUrlButton.addEventListener('click', function() {
+        const urlEntry = createUrlEntry();
+        urlsContainer.appendChild(urlEntry);
+        urlCount++;
+        updateRemoveButtons();
+    });
+
+    urlsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-url')) {
+            const urlEntry = e.target.closest('.url-entry');
+            urlEntry.remove();
+            updateRemoveButtons();
+        }
+    });
+});
+</script>
 {% endblock %}

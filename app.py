@@ -2,7 +2,7 @@
 from flask import Flask, render_template, flash, redirect, url_for,jsonify, session, request
 from forms import LoginForm, RegisterForm, RequestResetForm, ResetPasswordForm, FeedbackForm
 # --- Import Resource model ---
-from models import db, User, Resource
+from models import db, User, Resource, ResourceURL
 from flask_bcrypt import Bcrypt
 from functools import wraps
 from flask_migrate import Migrate
@@ -231,80 +231,102 @@ def categories():
 @app.route('/add_resource', methods=['GET', 'POST'])
 @login_required
 def add_resource():
-    # form = ResourceForm() # Uncomment if using WTForms
-    # if form.validate_on_submit(): # Uncomment if using WTForms
     if request.method == 'POST':
         title = request.form.get('title')
         description = request.form.get('description')
-        url = request.form.get('url')
+        urls = request.form.getlist('urls[]')
+        primary_url_index = int(request.form.get('primary_url', 0))
         subject = request.form.get('subject')
         difficulty = request.form.get('difficulty')
-        tags = request.form.get('tags') # Stored as comma-separated string
+        tags = request.form.get('tags')
 
-        if not title or not url:
-            flash('Title and URL are required fields.', 'danger')
-            # return render_template('add_resource.html', form=form) # If using WTForms
-            return render_template('add_resource.html') # Re-render form on error
+        if not title or not urls:
+            flash('Title and at least one URL are required fields.', 'danger')
+            return render_template('add_resource.html')
 
         try:
             new_resource = Resource(
                 title=title,
                 description=description,
-                url=url,
-                subject=subject if subject else None, # Handle empty string for subject
-                difficulty=difficulty if difficulty else None, # Handle empty string
-                tags=tags if tags else None, # Handle empty string
-                user_id=session['user_id'] # Associate with logged-in user
-                # 'completed' defaults to False, 'date_added' defaults to now
+                subject=subject,
+                difficulty=difficulty,
+                tags=tags,
+                user_id=session['user_id']
             )
             db.session.add(new_resource)
+            db.session.flush()  # Get the resource ID without committing
+
+            # Add URLs
+            for i, url in enumerate(urls):
+                resource_url = ResourceURL(
+                    url=url,
+                    is_primary=(i == primary_url_index),
+                    resource_id=new_resource.id
+                )
+                db.session.add(resource_url)
+
             db.session.commit()
             flash('Resource added successfully!', 'success')
             return redirect(url_for('dashboard'))
         except Exception as e:
-            db.session.rollback() # Rollback in case of error
-            flash(f'Error adding resource: {e}', 'danger')
-            # Optionally log the error: app.logger.error(f"Error adding resource: {e}")
+            db.session.rollback()
+            flash(f'Error adding resource: {str(e)}', 'danger')
+            return render_template('add_resource.html')
 
-    # For a GET request, display the form
-    # return render_template('add_resource.html', form=form) # If using WTForms
     return render_template('add_resource.html')
-# --- END UPDATED ADD_RESOURCE ROUTE ---
-
-# --- Add routes for Edit, Delete, Toggle Completion (Placeholders) ---
 
 @app.route('/resource/<int:resource_id>/edit', methods=['GET', 'POST'])
 @login_required
 def edit_resource(resource_id):
     resource = Resource.query.get_or_404(resource_id)
-    # Check if the logged-in user is the author of the resource
-    if resource.author.id != session['user_id']:
-         flash('You do not have permission to edit this resource.', 'danger')
-         return redirect(url_for('dashboard'))
+    
+    # Check if the resource belongs to the current user
+    if resource.user_id != session['user_id']:
+        flash('You do not have permission to edit this resource.', 'danger')
+        return redirect(url_for('dashboard'))
 
-    # form = ResourceForm(obj=resource) # Example if using WTForms
     if request.method == 'POST':
-         # --- Update resource logic ---
-         resource.title = request.form.get('title')
-         resource.description = request.form.get('description')
-         resource.url = request.form.get('url')
-         resource.subject = request.form.get('subject')
-         resource.difficulty = request.form.get('difficulty')
-         resource.tags = request.form.get('tags')
-         # Add validation as needed
-         try:
-             db.session.commit()
-             flash('Resource updated successfully!', 'success')
-             return redirect(url_for('dashboard'))
-         except Exception as e:
-             db.session.rollback()
-             flash(f'Error updating resource: {e}', 'danger')
-         # return render_template('edit_resource.html', form=form, resource=resource) # If using WTForms
-         return render_template('edit_resource.html', resource=resource)
+        title = request.form.get('title')
+        description = request.form.get('description')
+        urls = request.form.getlist('urls[]')
+        primary_url_index = int(request.form.get('primary_url', 0))
+        subject = request.form.get('subject')
+        difficulty = request.form.get('difficulty')
+        tags = request.form.get('tags')
 
-    # --- For GET request ---
-    # return render_template('edit_resource.html', form=form, resource=resource) # If using WTForms
-    return render_template('edit_resource.html', resource=resource) # Need an edit_resource.html template
+        if not title or not urls:
+            flash('Title and at least one URL are required fields.', 'danger')
+            return render_template('edit_resource.html', resource=resource)
+
+        try:
+            # Update basic resource info
+            resource.title = title
+            resource.description = description
+            resource.subject = subject
+            resource.difficulty = difficulty
+            resource.tags = tags
+
+            # Delete existing URLs
+            ResourceURL.query.filter_by(resource_id=resource.id).delete()
+
+            # Add new URLs
+            for i, url in enumerate(urls):
+                resource_url = ResourceURL(
+                    url=url,
+                    is_primary=(i == primary_url_index),
+                    resource_id=resource.id
+                )
+                db.session.add(resource_url)
+
+            db.session.commit()
+            flash('Resource updated successfully!', 'success')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating resource: {str(e)}', 'danger')
+            return render_template('edit_resource.html', resource=resource)
+
+    return render_template('edit_resource.html', resource=resource)
 
 @app.route('/resource/<int:resource_id>/mark_completed', methods=['POST'])
 @login_required

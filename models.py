@@ -34,7 +34,6 @@ class Resource(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    url = db.Column(db.String(255), nullable=False)
     subject = db.Column(db.String(50), nullable=True)
     difficulty = db.Column(db.String(20), nullable=True)
     tags = db.Column(db.String(150), nullable=True)
@@ -44,14 +43,30 @@ class Resource(db.Model):
     progress = db.Column(db.String(50), nullable=False, default='Not Started')
     progress_percentage = db.Column(db.Integer, nullable=False, default=0)
     last_updated = db.Column(db.DateTime, nullable=True, onupdate=datetime.utcnow)
+    urls = db.relationship('ResourceURL', backref='resource', lazy=True, cascade='all, delete-orphan')
 
     def __repr__(self):
-        return f"Resource('{self.title}', '{self.url}')"
+        return f"Resource('{self.title}')"
 
     def get_tags_list(self):
         if self.tags:
             return [tag.strip() for tag in self.tags.split(',') if tag.strip()]
         return []
+
+    def get_primary_url(self):
+        """Get the primary URL for the resource"""
+        primary_url = ResourceURL.query.filter_by(resource_id=self.id, is_primary=True).first()
+        return primary_url.url if primary_url else None
+
+class ResourceURL(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String(255), nullable=False)
+    is_primary = db.Column(db.Boolean, default=False)
+    resource_id = db.Column(db.Integer, db.ForeignKey('resource.id'), nullable=False)
+    date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"ResourceURL('{self.url}', primary={self.is_primary})"
 
 # --- Import or define your routes AFTER models and db are set up ---
 # Example: from your_routes_file import *
