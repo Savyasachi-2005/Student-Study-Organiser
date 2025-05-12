@@ -7,7 +7,7 @@
             <h1 class="hero-title">Study Resource Organizer</h1>
             <p class="hero-subtitle">Organize, track, and optimize your learning journey with our comprehensive resource management platform</p>
             <div class="hero-buttons">
-                <a href="{{ url_for('add_resource') }}" class="btn btn-primary">
+                <a href="{{ url_for("add_resource", url="") }}" class="btn btn-primary">
                     <i class="fas fa-plus-circle me-2"></i>Add New Resource
                 </a>
                 <a href="{{ url_for('track_progress') }}" class="btn btn-outline-light">
@@ -22,7 +22,7 @@
     <div class="container">
         <div class="row g-4">
             <div class="col-md-6 col-lg-3">
-                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for('add_resource') }}'">
+                <div class="card h-100 border-0 feature-card" onclick="window.location.href='{{ url_for("add_resource", url="") }}'">
                     <div class="card-body text-center p-4">
                         <div class="feature-icon-wrapper mb-3">
                             <i class="fas fa-link fa-2x text-primary"></i>
@@ -118,7 +118,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/></svg>') repeat;
+    background: url("data:image/svg+xml,%3Csvg%20width%3D'100'%20height%3D'100'%20viewBox%3D'0%200%20100%20100'%20xmlns%3D'http://www.w3.org/2000/svg'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'40'%20stroke%3D'rgba(255,255,255,0.3)'%20stroke-width%3D'2'%20fill%3D'none'/%3E%3C/svg%3E") repeat;
     opacity: 0.4;
     animation: float 20s linear infinite;
 }
@@ -144,6 +144,7 @@
     text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     background: linear-gradient(to right, #ffffff, #e0e0e0);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer 3s infinite;
     background-size: 200% auto;

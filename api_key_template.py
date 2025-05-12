@@ -1,3 +1,4 @@
  # Google OAuth Credentials
-client_id = 'YOUR_CLIENT_ID_HERE'
-client_secret = 'YOUR_CLIENT_SECRET_HERE'
+from dotenv import load_dotenv
+client_id = load_dotenv('client_id')
+client_secret = load_dotenv('client_secret')

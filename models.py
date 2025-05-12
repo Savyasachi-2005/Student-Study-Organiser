@@ -1,10 +1,19 @@
+from dotenv import load_dotenv
+import os
+
+# Specify the exact location of .env file
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+
+# Temporary check to ensure environment variables are loaded (remove later)
+print("DATABASE_URL:", os.environ.get("DATABASE_URL"))
+print("SECRET_KEY:", os.environ.get("SECRET_KEY"))
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_bcrypt import Bcrypt
-from flask_migrate import Migrate # Import Migrate
-import os # Import os module
-import warnings # Import the warnings module
+from flask_migrate import Migrate  # Import Migrate
+import warnings  # Import the warnings module
 
 # 1. Create the Flask app instance
 app = Flask(__name__)
@@ -71,6 +80,8 @@ class Resource(db.Model):
     subject = db.Column(db.String(50), nullable=True)
     difficulty = db.Column(db.String(20), nullable=True)
     tags = db.Column(db.String(150), nullable=True)
+    # New column to satisfy the not-null constraint.
+    url = db.Column(db.String(255), nullable=False, default='')
     type = db.Column(db.String(20), nullable=True, default='Link')
     date_added = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -138,6 +138,7 @@ def register():
         elif existing_user_username:
              flash('Username already taken.', 'danger')
         else:
+            # Generate a proper bcrypt hash for the password
             hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             user = User(
                 username=form.username.data,
