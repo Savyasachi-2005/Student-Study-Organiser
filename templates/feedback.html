@@ -9,43 +9,54 @@
     align-items: center;
     background: linear-gradient(135deg, var(--primary-color) 0%, #2C5282 100%);
     padding: 2rem 0;
+    transition: background 0.5s ease;
+}
+.feedback-page:hover {
+    background: linear-gradient(135deg, var(--primary-color) 10%, #2C5282 90%);
 }
 
 .feedback-card {
     border-radius: 1rem;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
 }
 
 .feedback-header {
     text-align: center;
-    padding: 2rem 0;
+    padding: 2.5rem 0;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgba(74,144,226,0.05);
 }
 
 .feedback-header i {
-    font-size: 3rem;
+    font-size: 3.5rem;
     color: var(--primary-color);
     margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.feedback-header i:hover {
+    transform: scale(1.1);
 }
 
 .feedback-form {
-    padding: 2rem;
+    padding: 2.5rem;
 }
 
 .contact-info {
     text-align: center;
-    padding: 1rem;
-    background: rgba(74, 144, 226, 0.1);
-    border-radius: 0.5rem;
+    padding: 1.5rem;
+    background: rgba(74, 144, 226, 0.12);
+    border-radius: 0.75rem;
     margin-bottom: 1.5rem;
 }
 
 .contact-info a {
     color: var(--primary-color);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: color 0.3s ease;
 }
 
 .contact-info a:hover {
@@ -62,16 +73,18 @@
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     margin-top: 0.5rem;
+    transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .whatsapp-link:hover {
     background: #128C7E;
-    color: white !important;
-    text-decoration: none !important;
+    transform: translateY(-2px);
 }
 
-.whatsapp-link i {
-    font-size: 1.2rem;
+textarea.form-control {
+    min-height: 150px;
+    resize: vertical;
+    border-radius: 0.5rem;
 }
 
 .form-floating > .form-control:focus ~ label,
@@ -90,17 +103,13 @@
     transition: all 0.3s ease;
     padding: 0.75rem 1.5rem;
     font-weight: 500;
+    border-radius: 0.5rem;
 }
 
 .btn-primary:hover {
     background: #2C5282;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-textarea.form-control {
-    min-height: 150px;
-    resize: vertical;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .form-select {
@@ -194,4 +203,4 @@ textarea.form-control {
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
